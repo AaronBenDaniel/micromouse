@@ -101,7 +101,7 @@ maze=[
 ]
 
 
-def neighbors(y,x,bias):
+def neighbors(y,x,bias="None"):
     if bias==0:
         neighbors=[[y,x+1,"right"],[y-1,x,"up"],[y+1,x,"down"],[y,x-1,"left"]]
     elif bias==180:
@@ -121,7 +121,7 @@ def maze_distance(walls,start_y,start_x):
         #determine distance
         lowest_distance=distances[y][x]
         found_lower=0
-        for cell in neighbors(y,x,"None"):
+        for cell in neighbors(y,x):
             if not((cell[0]>=0 and cell[0]<len(distances)) and (cell[1]>=0 and cell[1]<len(distances[0]))):
                  continue
             if lowest_distance>distances[cell[0]][cell[1]]: #does this neighboring cell have a lowest distance
@@ -145,7 +145,7 @@ def maze_distance(walls,start_y,start_x):
             return distances
         visited[y][x]=distances[y][x]
         #recurse
-        for cell in neighbors(y,x,"None"):
+        for cell in neighbors(y,x):
             if not((cell[0]>=0 and cell[0]<len(distances)) and (cell[1]>=0 and cell[1]<len(distances[0]))):
                 continue
             if not(distances[cell[0]][cell[1]]<=lowest_distance):
