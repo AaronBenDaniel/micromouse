@@ -1,4 +1,3 @@
-add bias towards less turning
 make a maze that triggers this bug \/
 make sure sprint() does not try to go through enexplored parts of the maze
 allow the mouse to require only a relative position of a goal
