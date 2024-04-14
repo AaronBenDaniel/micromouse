@@ -5,7 +5,7 @@ import copy
 
 max_distance=1000
 maze_scale=40
-turtle_offset=[500,-700]
+turtle_offset=[300,-500]
 direction=0
 
 #THE print_grid FUNCTION WAS ENTIRLY WRITTEN BY CHATGPT3.5
