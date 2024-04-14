@@ -46,27 +46,27 @@ def print_matrix(matrix):
 
 #0 nothing, 1 top, 2 left, 3 both
 maze=[
-    [3, 3, 1, 1, 3, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 1, 3, 2],
-    [2, 0, 1, 2, 1, 2, 2, 2, 3, 1, 1, 1, 3, 3, 1, 0, 2, 0, 2, 0, 2],
-    [3, 1, 2, 3, 2, 0, 1, 0, 2, 0, 3, 2, 0, 0, 3, 3, 1, 3, 1, 0, 2],
-    [2, 2, 0, 2, 2, 3, 3, 1, 1, 1, 2, 1, 1, 2, 2, 0, 2, 1, 2, 3, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2],
+    [2, 2, 3, 1, 2, 2, 1, 3, 1, 2, 2, 3, 0, 3, 1, 2, 1, 3, 1, 1, 2],
+    [2, 2, 2, 2, 2, 3, 0, 3, 0, 2, 2, 2, 3, 0, 2, 1, 1, 0, 3, 0, 2],
+    [2, 0, 2, 2, 2, 1, 1, 2, 2, 0, 0, 2, 2, 2, 2, 3, 1, 1, 0, 3, 2],
+    [3, 1, 0, 2, 1, 0, 2, 2, 1, 2, 1, 0, 2, 1, 2, 3, 1, 2, 1, 0, 2],
+    [2, 1, 3, 1, 3, 1, 2, 3, 0, 3, 1, 1, 1, 0, 2, 2, 2, 1, 2, 3, 2],
+    [3, 2, 2, 1, 0, 2, 0, 2, 3, 1, 1, 0, 3, 1, 1, 2, 3, 0, 2, 0, 2],
+    [2, 0, 3, 1, 1, 1, 2, 2, 1, 0, 2, 0, 3, 2, 2, 0, 2, 1, 2, 1, 2],
+    [2, 3, 1, 2, 3, 0, 2, 2, 3, 1, 1, 0, 0, 2, 3, 1, 1, 2, 1, 0, 2],
+    [2, 0, 2, 1, 2, 3, 0, 3, 0, 3, 1, 2, 2, 0, 2, 1, 2, 1, 3, 0, 2],
+    [2, 1, 3, 0, 0, 2, 1, 0, 3, 2, 0, 2, 2, 1, 3, 2, 3, 0, 0, 3, 2],
+    [3, 2, 1, 3, 1, 3, 0, 1, 0, 1, 2, 3, 1, 2, 2, 0, 3, 1, 2, 2, 2],
+    [2, 3, 0, 2, 2, 1, 1, 2, 3, 1, 0, 2, 2, 1, 2, 1, 2, 1, 2, 0, 2],
+    [2, 0, 2, 2, 3, 1, 2, 1, 0, 3, 3, 1, 1, 2, 1, 0, 3, 0, 2, 1, 2],
+    [3, 3, 0, 2, 1, 2, 1, 3, 1, 0, 2, 1, 2, 3, 1, 2, 2, 1, 2, 2, 2],
+    [2, 2, 1, 1, 0, 2, 2, 2, 1, 2, 3, 0, 1, 2, 2, 0, 3, 0, 0, 2, 2],
+    [2, 1, 1, 3, 1, 2, 2, 1, 0, 2, 1, 3, 0, 0, 3, 1, 2, 2, 3, 2, 2],
+    [2, 1, 1, 2, 2, 0, 1, 1, 1, 2, 2, 0, 3, 1, 2, 2, 0, 2, 2, 0, 2],
+    [2, 2, 2, 2, 2, 1, 0, 3, 0, 2, 3, 1, 1, 0, 2, 3, 1, 2, 2, 3, 2],
+    [2, 0, 2, 0, 3, 1, 1, 0, 3, 0, 2, 1, 1, 1, 0, 2, 2, 0, 2, 0, 2],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
 ]
 
 # maze=[
@@ -236,7 +236,42 @@ def navigate(objective):
         print(move)
     print("Done!")
 
-
+def sprint(objective):
+    global current_position
+    global direction
+    print("Returning to start")
+    navigate(start_coords)
+    real_direction=direction
+    moves=[]
+    move=0
+    print("Calculating shortest route")
+    while (move != "No move needed; Already at goal"):
+        move=next_move(memory,current_position,objective)
+        if move == "Up":
+            current_position[0]=current_position[0]-1
+        elif move == "Left":
+            current_position[1]=current_position[1]-1
+        elif move == "Right":
+            current_position[1]=current_position[1]+1
+        elif move == "Down":
+            current_position[0]=current_position[0]+1
+        moves.append(move)
+    print("Done!")
+    current_position=[0,0]
+    direction=real_direction
+    print("Sprint!")
+    for move in moves:
+        make_move(move)
+        if move == "Up":
+            current_position[0]=current_position[0]-1
+        elif move == "Left":
+            current_position[1]=current_position[1]-1
+        elif move == "Right":
+            current_position[1]=current_position[1]+1
+        elif move == "Down":
+            current_position[0]=current_position[0]+1
+        print(move)
+    print("Done!")
 
 def draw_cell(cell_y,cell_x,borders,color):
     turtle.color(color)
@@ -360,13 +395,13 @@ for i in range(len(maze)):
     for k in range(len(maze[0])):
             working_list.append(0)
     memory.append(working_list)
-goal_coords=[0,0]#y,x
-start_coords=[2,11]
+goal_coords=[9,9]#y,x
+start_coords=[0,0]
 current_position=start_coords
-# print_matrix(memory)
-output=maze_distance(maze,goal_coords[0],goal_coords[1]) #print distances
-print_grid(output[1],output[0]) #print distances
-start_coords=[2,11]
+#print_matrix(memory)
+# output=maze_distance(maze,goal_coords[0],goal_coords[1]) #print distances
+# print_grid(output[1],output[0]) #print distances
+start_coords=[0,0]
 turtle.width(1)
 #draw_maze(maze)
 turtle.width(4)
@@ -380,11 +415,7 @@ print("Navigating back to start")
 current_color="yellow"
 navigate(start_coords)
 
-current_color="blue"
-print("Navigating to goal")
-navigate(goal_coords)
-print("Navigating back to start")
-current_color="yellow"
-navigate(start_coords)
+current_color="red"
+sprint(goal_coords)
 
 turtle.done()
