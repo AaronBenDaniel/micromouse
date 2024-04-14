@@ -92,7 +92,7 @@ maze=[
     [3, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2],
     [2, 2, 2, 1, 1, 1, 2, 1, 3, 1, 2],
     [2, 1, 3, 3, 0, 2, 1, 0, 0, 2, 2],
-    [2, 2, 2, 0, 2, 2, 2, 1, 1, 2, 2],
+    [2, 2, 2, 0, 2, 2, 0, 1, 1, 2, 2],
     [2, 2, 2, 3, 1, 2, 3, 1, 2, 0, 2],
     [2, 2, 1, 2, 2, 1, 0, 2, 1, 2, 2],
     [2, 3, 0, 2, 1, 1, 3, 1, 0, 2, 2],
@@ -101,12 +101,15 @@ maze=[
 ]
 
 
-def neighbors(y,x):
-    neighbors=[
-                            [y-1,x,"up"],
-            [y,x-1,"left"],              [y,x+1,"right"],
-                        [y+1,x,"down"]
-    ]
+def neighbors(y,x,bias):
+    if bias==0:
+        neighbors=[[y,x+1,"right"],[y-1,x,"up"],[y+1,x,"down"],[y,x-1,"left"]]
+    elif bias==180:
+        neighbors=[[y,x-1,"left"],[y-1,x,"up"],[y+1,x,"down"],[y,x+1,"right"]]
+    elif bias==270:
+        neighbors=[[y+1,x,"down"],[y,x-1,"left"],[y,x+1,"right"],[y-1,x,"up"]]
+    else:
+        neighbors=[[y-1,x,"up"],[y,x-1,"left"],[y,x+1,"right"],[y+1,x,"down"]]
     return(neighbors)
 
 def maze_distance(walls,start_y,start_x):
@@ -118,7 +121,7 @@ def maze_distance(walls,start_y,start_x):
         #determine distance
         lowest_distance=distances[y][x]
         found_lower=0
-        for cell in neighbors(y,x):
+        for cell in neighbors(y,x,"None"):
             if not((cell[0]>=0 and cell[0]<len(distances)) and (cell[1]>=0 and cell[1]<len(distances[0]))):
                  continue
             if lowest_distance>distances[cell[0]][cell[1]]: #does this neighboring cell have a lowest distance
@@ -142,7 +145,7 @@ def maze_distance(walls,start_y,start_x):
             return distances
         visited[y][x]=distances[y][x]
         #recurse
-        for cell in neighbors(y,x):
+        for cell in neighbors(y,x,"None"):
             if not((cell[0]>=0 and cell[0]<len(distances)) and (cell[1]>=0 and cell[1]<len(distances[0]))):
                 continue
             if not(distances[cell[0]][cell[1]]<=lowest_distance):
@@ -180,7 +183,7 @@ def next_move(walls,start_coords,goal_coords):
     y=start_coords[0]
     x=start_coords[1]
     found_lower=0
-    for cell in neighbors(y,x):
+    for cell in neighbors(y,x,direction):
         if not((cell[0]>=0 and cell[0]<len(distances)) and (cell[1]>=0 and cell[1]<len(distances[0]))): #Is the neighboring cell in bounds
                 continue
         if start_distance>distances[cell[0]][cell[1]]: #does this neighboring cell have a lower distance
@@ -249,12 +252,16 @@ def sprint(objective):
     while (move != "No move needed; Already at goal"):
         move=next_move(memory,current_position,objective)
         if move == "Up":
+            direction=90
             current_position[0]=current_position[0]-1
         elif move == "Left":
+            direction=180
             current_position[1]=current_position[1]-1
         elif move == "Right":
+            direction=0
             current_position[1]=current_position[1]+1
         elif move == "Down":
+            direction=270
             current_position[0]=current_position[0]+1
         moves.append(move)
     print("Done!")
