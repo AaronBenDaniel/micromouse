@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import turtle
+import copy
 
 max_distance=1000
 maze_scale=40
@@ -241,7 +242,7 @@ def sprint(objective):
     global direction
     print("Returning to start")
     navigate(start_coords)
-    real_direction=direction
+    real_direction=copy.deepcopy(direction)
     moves=[]
     move=0
     print("Calculating shortest route")
@@ -257,8 +258,8 @@ def sprint(objective):
             current_position[0]=current_position[0]+1
         moves.append(move)
     print("Done!")
-    current_position=[0,0]
-    direction=real_direction
+    current_position=copy.deepcopy(start_coords)
+    direction=copy.deepcopy(real_direction)
     print("Sprint!")
     for move in moves:
         make_move(move)
@@ -397,13 +398,12 @@ for i in range(len(maze)):
     memory.append(working_list)
 goal_coords=[9,9]#y,x
 start_coords=[0,0]
-current_position=start_coords
+current_position=copy.deepcopy(start_coords)
 #print_matrix(memory)
 # output=maze_distance(maze,goal_coords[0],goal_coords[1]) #print distances
 # print_grid(output[1],output[0]) #print distances
-start_coords=[0,0]
 turtle.width(1)
-draw_maze(maze)
+#draw_maze(maze)
 turtle.width(4)
 draw_start_and_end(start_coords,goal_coords)
 turtle.setpos(start_coords[1]*maze_scale+maze_scale*.5+turtle_offset[1],-1*(start_coords[0]*maze_scale+maze_scale*.5)+turtle_offset[0])
