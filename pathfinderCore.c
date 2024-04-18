@@ -114,19 +114,74 @@ void maze_distances(int start_y,int start_x){
         if(!(y>=0 && y<MAXMAZESIZE && x>=0 && x<MAXMAZESIZE)){
             return;
         }
-
         //determine distance
         int lowest_distance=distances[y][x];
         int found_lower=0;
-        
+        int neighboring_cells_recurse[12];
+        neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
+        int cell_y;
+        int cell_x;
+        int cell_direction;
+        for(int i=0;i<3;i++){
+            cell_y=neighboring_cells_recurse[0+3*i];
+            cell_x=neighboring_cells_recurse[1+3*i];
+            cell_direction=neighboring_cells_recurse[2+3*i];
+            //check if cell is in bounds
+            if(!(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE)){
+                return;
+            }
+            if(lowest_distance>distances[cell_y][cell_x]){ //is there a neighbor with a lower distance? POTENTIAL OPTIMIZATON: add "-1" to lowest_distance
+                //determine if there is a wall inbetween the current cell and the neighbor
+                if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
+                    found_lower=1;
+                    lowest_distance=distances[cell_y][cell_x];
+                }
+                if(cell_direction==UP && memory[y][x]!=1 && memory[y][x]!=3){
+                    found_lower=1;
+                    lowest_distance=distances[cell_y][cell_x];
+                }
+                if(cell_direction==LEFT && memory[y][x]!=2 && memory[y][x]!=3){
+                    found_lower=1;
+                    lowest_distance=distances[cell_y][cell_x];
+                }
+                if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
+                    found_lower=1;
+                    lowest_distance=distances[cell_y][cell_x];
+                }
+            }
+        }
+        if(found_lower==1){
+            distances[y][x]=lowest_distance+1;
+        }
+        if(!(distances[y][x]<visited[y][x])){
+            return;
+        }
+        visited[y][x]=distances[y][x];
 
     }
     //check if start cell is in bounds
     if(!(start_y>=0 && start_y<MAXMAZESIZE && start_x>=0 && start_x<MAXMAZESIZE)){
         printf("INVALID START CELL");
     }
+    //initialize distances matrix to all MAXDISTANCE
+    for(int i=0;i<MAXMAZESIZE;i++){
+        for(int j=0;j<MAXMAZESIZE;j++){
+            distances[i][j]=MAXDISTANCE;
+        }
+    }
+    //initialize visted matrix to all MAXDISTANCE
+    for(int i=0;i<MAXMAZESIZE;i++){
+        for(int j=0;j<MAXMAZESIZE;j++){
+            visited[i][j]=MAXDISTANCE;
+        }
+    }
     distances[start_y][start_x]=0;
-    recurse(start_y,start_x);
+    //int *neighboring_cells=(int *)calloc(12, sizeof(int)); 
+    int neighboring_cells[12];
+    neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
+    for(int i=0;i<4;i++){
+        recurse(neighboring_cells[0+3*i],neighboring_cells[1+3*i]);
+    }
 }
 
 int main(){
@@ -165,6 +220,9 @@ for(int i=0;i<MAXMAZESIZE;i++){
     }
 }
 
+int start_y=0;
+int start_x=0;
+maze_distances(start_y,start_x);
 int *neighborsb=(int *)calloc(12, sizeof(int));
 neighbors(1,1,UP,neighborsb);
 printf("%d,%d,%d\n%d,%d,%d\n%d,%d,%d\n%d,%d,%d\n",neighborsb[0],neighborsb[1],neighborsb[2],neighborsb[3],neighborsb[4],neighborsb[5],neighborsb[6],neighborsb[7],neighborsb[8],neighborsb[9],neighborsb[10],neighborsb[11]);
