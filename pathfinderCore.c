@@ -108,11 +108,25 @@ void neighbors(int y,int x,int bias,int *pointer){
     }
 }
 
-void maze_distances(int start_x,int start_y){
-    void recurse(int *distances,int y,int x){
+void maze_distances(int start_y,int start_x){
+    void recurse(int y,int x){
+        //check if cell is in bounds
+        if(!(y>=0 && y<MAXMAZESIZE && x>=0 && x<MAXMAZESIZE)){
+            return;
+        }
+
+        //determine distance
+        int lowest_distance=distances[y][x];
+        int found_lower=0;
+        
 
     }
-
+    //check if start cell is in bounds
+    if(!(start_y>=0 && start_y<MAXMAZESIZE && start_x>=0 && start_x<MAXMAZESIZE)){
+        printf("INVALID START CELL");
+    }
+    distances[start_y][start_x]=0;
+    recurse(start_y,start_x);
 }
 
 int main(){
