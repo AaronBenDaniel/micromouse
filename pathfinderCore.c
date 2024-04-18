@@ -108,4 +108,5 @@ neighborsb[10]=11;
 neighborsb[11]=12;
 neighbors(1,1,UP,neighborsb);
 printf("%d,%d,%d\n%d,%d,%d\n%d,%d,%d\n%d,%d,%d\n",neighborsb[0],neighborsb[1],neighborsb[2],neighborsb[3],neighborsb[4],neighborsb[5],neighborsb[6],neighborsb[7],neighborsb[8],neighborsb[9],neighborsb[10],neighborsb[11]);
+free(neighborsb);
 }
