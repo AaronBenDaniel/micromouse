@@ -52,7 +52,7 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     }
 }
 
-//make sure initialize a variable to recieve results into first
+//make sure to initialize a variable to recieve results into first
 void neighbors(int y,int x,int bias,int *pointer){
     if (bias==RIGHT){
         pointer[0] = y;
