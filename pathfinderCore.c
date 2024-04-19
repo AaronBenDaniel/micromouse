@@ -59,61 +59,63 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
 
 //make sure to initialize a variable to recieve results into first
 void neighbors(int y,int x,int bias,int *pointer){
-    if (bias==RIGHT){
-        pointer[0] = y;
-        pointer[1] = x+1;
-        pointer[2] = RIGHT;
-        pointer[3] = y+1;
-        pointer[4] = x;
-        pointer[5] = DOWN;
-        pointer[6] = y-1;
-        pointer[7] = x;
-        pointer[8] = UP;
-        pointer[9] = y;
-        pointer[10] = x-1;
-        pointer[11] = LEFT;
-    }
-    if (bias==UP){
-        pointer[0] = y+1;
-        pointer[1] = x;
-        pointer[2] = DOWN;
-        pointer[3] = y;
-        pointer[4] = x+1;
-        pointer[5] = RIGHT;
-        pointer[6] = y;
-        pointer[7] = x-1;
-        pointer[8] = LEFT;
-        pointer[9] = y-1;
-        pointer[10] = x;
-        pointer[11] = UP;
-    }
-    if (bias==LEFT){
-        pointer[0] = y;
-        pointer[1] = x-1;
-        pointer[2] = LEFT;
-        pointer[3] = y+1;
-        pointer[4] = x;
-        pointer[5] = DOWN;
-        pointer[6] = y-1;
-        pointer[7] = x;
-        pointer[8] = UP;
-        pointer[9] = y;
-        pointer[10] = x-1;
-        pointer[11] = RIGHT;
-    }
-    if (bias==DOWN){
-        pointer[0] = y-1;
-        pointer[1] = x;
-        pointer[2] = UP;
-        pointer[3] = y;
-        pointer[4] = x+1;
-        pointer[5] = RIGHT;
-        pointer[6] = y;
-        pointer[7] = x-1;
-        pointer[8] = LEFT;
-        pointer[9] = y+1;
-        pointer[10] = x;
-        pointer[11] = DOWN;
+    switch(bias){
+        case RIGHT:
+            pointer[0] = y;
+            pointer[1] = x+1;
+            pointer[2] = RIGHT;
+            pointer[3] = y+1;
+            pointer[4] = x;
+            pointer[5] = DOWN;
+            pointer[6] = y-1;
+            pointer[7] = x;
+            pointer[8] = UP;
+            pointer[9] = y;
+            pointer[10] = x-1;
+            pointer[11] = LEFT;
+        break;
+        case UP:
+            pointer[0] = y-1;
+            pointer[1] = x;
+            pointer[2] = UP;
+            pointer[3] = y;
+            pointer[4] = x+1;
+            pointer[5] = RIGHT;
+            pointer[6] = y;
+            pointer[7] = x-1;
+            pointer[8] = LEFT;
+            pointer[9] = y+1;
+            pointer[10] = x;
+            pointer[11] = DOWN;
+        break;
+        case LEFT:
+            pointer[0] = y;
+            pointer[1] = x-1;
+            pointer[2] = LEFT;
+            pointer[3] = y+1;
+            pointer[4] = x;
+            pointer[5] = DOWN;
+            pointer[6] = y-1;
+            pointer[7] = x;
+            pointer[8] = UP;
+            pointer[9] = y;
+            pointer[10] = x-1;
+            pointer[11] = RIGHT;
+        break;
+        case DOWN:
+            pointer[0] = y+1;
+            pointer[1] = x;
+            pointer[2] = DOWN;
+            pointer[3] = y;
+            pointer[4] = x+1;
+            pointer[5] = RIGHT;
+            pointer[6] = y;
+            pointer[7] = x-1;
+            pointer[8] = LEFT;
+            pointer[9] = y-1;
+            pointer[10] = x;
+            pointer[11] = UP;
+        break;
     }
 }
 
@@ -236,6 +238,15 @@ int next_move(int target_y,int target_x){
         }
     }
     return NOMOVE;
+}
+
+//WRITE ME!
+void measure(){
+    ;
+}
+
+void make_move(int move,int number){
+
 }
 
 int main(){
