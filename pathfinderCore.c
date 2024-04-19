@@ -25,6 +25,7 @@
 #define UP 1
 #define LEFT 2
 #define DOWN 3
+#define NOMOVE -1
 #define MAXMAZESIZE 11
 #define MAXDISTANCE 1000
 
@@ -36,6 +37,10 @@ int visited[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize memory matrix
 int memory[MAXMAZESIZE][MAXMAZESIZE];
+
+int current_y;
+int current_x;
+int current_direction;
 
 void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     printf("Matrix:\n");
@@ -191,6 +196,48 @@ void maze_distances(int start_y,int start_x){
     }
 }
 
+int next_move(int target_y,int target_x){
+    //are we already at the target coords
+    if(current_y==target_y && current_x==target_x){
+        return NOMOVE;
+    }
+    //calculate distances
+    maze_distances(target_y,target_x);
+    int current_distance=distances[current_y][current_x];
+    int neighbors_next_move[12];
+    int cell_y;
+    int cell_x;
+    int cell_direction;
+    neighbors(current_y,current_x,current_direction,neighbors_next_move);
+    //check to find lower reachable distance
+    for(int i=0;i<4;i++){
+        cell_y=neighbors_next_move[0+3*i];
+        cell_x=neighbors_next_move[1+3*i];
+        cell_direction=neighbors_next_move[2+3*i];
+        //check if cell is in bounds
+        if(!(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE)){
+            continue;
+        }
+        //check if cell has a lower distance
+        if(!(distances[cell_y][cell_x]<current_distance)){
+            continue;
+        }
+        if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
+            return RIGHT;
+        }
+        if(cell_direction==UP && memory[current_y][current_x]!=1 && memory[current_y][current_x]!=3){
+            return UP;
+        }
+        if(cell_direction==LEFT && memory[current_y][current_x]!=2 && memory[current_y][current_x]!=3){
+            return LEFT;
+        }   
+        if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
+            return DOWN;
+        }
+    }
+    return NOMOVE;
+}
+
 int main(){
     int maze[MAXMAZESIZE][MAXMAZESIZE]={
     {3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2},
@@ -247,11 +294,15 @@ for(int i=0;i<MAXMAZESIZE;i++){
         memory[i][j]=maze[i][j];
     }
 }
+
 int start_y=0;
 int start_x=0;
+int start_direction=RIGHT;
 int goal_y=3;
 int goal_x=3;
-maze_distances(goal_y,goal_x);
-printf("Distances=\n");
-print_matrix(distances);
+current_y=start_y;
+current_x=start_x;
+current_direction=start_direction;
+
+printf("%d\n",next_move(goal_y,goal_x));
 }
