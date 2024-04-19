@@ -269,16 +269,16 @@ void measure(){
 void forward(){
     switch(current_direction){
         case RIGHT:
-        current_x=current_x+1;
+        current_x++;
         break;
         case UP:
-        current_y=current_y-1;
+        current_y--;
         break;
         case LEFT:
-        current_x=current_x-1;
+        current_x--;
         break;
         case DOWN:
-        current_y=current_y+1;
+        current_y++;
         break;
     }
 }
@@ -377,6 +377,62 @@ void navigate(int target_y,int target_x){
     printf("Done!\n");
 }
 
+void sprint(int start_y,int start_x,int objective_y,int objective_x){
+    printf("Returning to start!\n");
+    navigate(start_y,start_x);
+    int real_y=current_y;
+    int real_x=current_x;
+    int real_direction=current_direction;
+    int moves[MAXDISTANCE];
+    int move=0;
+    int move_counter=0;
+    while(move!=NOMOVE){
+        move=next_move(objective_y,objective_x);
+        switch(move){
+            case RIGHT:
+                current_direction=0;
+                current_x++;
+            break;
+            case UP:
+                current_direction=1;
+                current_y--;
+            break;
+            case LEFT:
+                current_direction=2;
+                current_x--;
+            break;
+            case DOWN:
+                current_direction=3;
+                current_y++;
+            break;
+        }
+        moves[move_counter]=move;
+        move_counter++;
+    }
+    int path_length=move_counter;
+    move_counter=1;
+    //REFACTOR EVERYTHING BELOW
+    int previous_move=NOMOVE;
+    for(int i=0;i<=path_length;i++){
+        if(moves[i]==previous_move){
+            move_counter++;
+            previous_move=moves[i];
+            continue;
+        }
+        make_move(previous_move,move_counter);
+        if(move_counter==1){
+            print_move(previous_move);
+            printf("\n");
+        }
+        else{
+            print_move(previous_move);
+            printf(" %d times\n",move_counter);
+        }
+        previous_move=moves[i];
+        move_counter=1;
+    }
+}
+
 int main(){
     int maze[MAXMAZESIZE][MAXMAZESIZE]={
     {3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2},
@@ -442,5 +498,5 @@ int goal_x=3;
 current_y=start_y;
 current_x=start_x;
 current_direction=start_direction;
-navigate(goal_y,goal_x);
+sprint(start_y,start_x,goal_y,goal_x);
 }
