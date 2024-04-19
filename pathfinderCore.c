@@ -57,6 +57,26 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     }
 }
 
+void print_move(int move){
+    switch(move){
+        case RIGHT:
+            printf("Right");
+        break;
+        case UP:
+            printf("Up");
+        break;
+        case LEFT:
+            printf("Left");
+        break;
+        case DOWN:
+            printf("Down");
+        break;
+        case NOMOVE:
+            printf("No Move");
+        break;
+    }
+}
+
 //make sure to initialize a variable to recieve results into first
 void neighbors(int y,int x,int bias,int *pointer){
     switch(bias){
@@ -344,6 +364,19 @@ void make_move(int move,int number){
     }
 }
 
+void navigate(int target_y,int target_x){
+    measure();
+    int move=0;
+    while(move!=NOMOVE){
+        move=next_move(target_y,target_x);
+        make_move(move,1);
+        print_move(move);
+        printf("\n");
+        measure();
+    }
+    printf("Done!\n");
+}
+
 int main(){
     int maze[MAXMAZESIZE][MAXMAZESIZE]={
     {3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2},
@@ -409,6 +442,5 @@ int goal_x=3;
 current_y=start_y;
 current_x=start_x;
 current_direction=start_direction;
-
-printf("%d\n",next_move(goal_y,goal_x));
+navigate(goal_y,goal_x);
 }

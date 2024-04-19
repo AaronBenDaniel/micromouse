@@ -406,7 +406,7 @@ for i in range(len(maze)):
     for k in range(len(maze[0])):
             working_list.append(0)
     memory.append(working_list)
-goal_coords=[4,4]#y,x
+goal_coords=[3,3]#y,x
 start_coords=[0,0]
 current_position=copy.deepcopy(start_coords)
 #print_matrix(memory)
@@ -422,11 +422,11 @@ current_color="blue"
 memory=maze
 print("Navigating to goal")
 navigate(goal_coords)
-print("Navigating back to start")
-current_color="yellow"
-navigate(start_coords)
+# print("Navigating back to start")
+# current_color="yellow"
+# navigate(start_coords)
 
-current_color="red"
-sprint(goal_coords)
+# current_color="red"
+# sprint(goal_coords)
 
 turtle.done()
