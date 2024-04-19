@@ -245,8 +245,51 @@ void measure(){
     ;
 }
 
-void make_move(int move,int number){
+//NEEDS HARDWARE INTERFACE
+void forward(){
+    switch(current_direction){
+        case RIGHT:
+        current_x=current_x+1;
+        break;
+        case UP:
+        current_y=current_y-1;
+        break;
+        case LEFT:
+        current_x=current_x-1;
+        break;
+        case DOWN:
+        current_y=current_y+1;
+        break;
+    }
+}
 
+//NEEDS HARDWARE INTERFACE
+void turn_right(){
+    current_direction=current_direction-1;
+    while(current_direction<0){
+        current_direction=current_direction+4;
+    }
+}
+
+//NEEDS HARDWARE INTERFACE
+void turn_left(){
+    current_direction=current_direction+1;
+    while(current_direction>3){
+        current_direction=current_direction-4;
+    }
+}
+
+void make_move(int move,int number){
+    switch(move){
+        case RIGHT:
+        break;
+        case UP:
+        break;
+        case LEFT:
+        break;
+        case DOWN:
+        break;
+    }
 }
 
 int main(){
