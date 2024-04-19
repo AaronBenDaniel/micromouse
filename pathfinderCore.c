@@ -282,12 +282,64 @@ void turn_left(){
 void make_move(int move,int number){
     switch(move){
         case RIGHT:
+            if(current_direction==UP){
+                turn_right();
+            }
+            if(current_direction==LEFT){
+                turn_right();
+                turn_right();
+            }
+            if(current_direction==DOWN){
+                turn_left();
+            }
+            for(int i=0;i<number;i++){
+                forward();
+            }
         break;
         case UP:
+            if(current_direction==RIGHT){
+                turn_left();
+            }
+            if(current_direction==LEFT){
+                turn_right();
+            }
+            if(current_direction==DOWN){
+                turn_right();
+                turn_right();
+            }
+            for(int i=0;i<number;i++){
+                forward();
+            }
         break;
         case LEFT:
+            if(current_direction==RIGHT){
+                turn_right();
+                turn_right();
+            }
+            if(current_direction==UP){
+                turn_left();
+            }
+            if(current_direction==DOWN){
+                turn_right();
+            }
+            for(int i=0;i<number;i++){
+                forward();
+            }
         break;
         case DOWN:
+            if(current_direction==RIGHT){
+                turn_left();
+            }
+            if(current_direction==UP){
+                turn_right();
+                turn_right();
+            }
+            if(current_direction==LEFT){
+                turn_left();
+            }
+            for(int i=0;i<number;i++){
+                forward();
+            }
         break;
     }
 }
