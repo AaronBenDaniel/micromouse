@@ -52,8 +52,7 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     }
 }
 
-//run \/ \/ \/ 
-//*neighbors=(int *)calloc(12, sizeof(int));
+//make sure initialize a variable to recieve results into first
 void neighbors(int y,int x,int bias,int *pointer){
     if (bias==RIGHT){
         pointer[0] = y;
@@ -126,6 +125,7 @@ void maze_distances(int start_y,int start_x){
         int cell_y;
         int cell_x;
         int cell_direction;
+        //check neighbors for a lower distance
         for(int i=0;i<4;i++){
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
@@ -158,6 +158,7 @@ void maze_distances(int start_y,int start_x){
             return;
         }
         visited[y][x]=distances[y][x];
+        //recurse
         for(int i=0;i<4;i++){
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
@@ -240,6 +241,7 @@ for(int i=0;i<MAXMAZESIZE;i++){
     }
 }
 
+//load the maze into memory
 for(int i=0;i<MAXMAZESIZE;i++){
     for(int j=0;j<MAXMAZESIZE;j++){
         memory[i][j]=maze[i][j];
