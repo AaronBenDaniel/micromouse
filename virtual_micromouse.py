@@ -4,7 +4,7 @@ import turtle
 import copy
 
 max_distance=1000
-maze_scale=40
+maze_scale=30
 turtle_offset=[300,-500]
 direction=0
 
@@ -70,35 +70,35 @@ def print_matrix(matrix):
 #     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
 # ]
 
-# maze=[
-#     [3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2],
-#     [2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2],
-#     [2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2],
-#     [2, 3, 1, 1, 1, 0, 1, 0, 2, 0, 0, 2, 2],
-#     [2, 1, 1, 1, 1, 2, 3, 1, 0, 1, 2, 2, 2],
-#     [3, 2, 1, 1, 1, 2, 3, 1, 1, 1, 2, 0, 2],
-#     [2, 1, 1, 1, 0, 2, 0, 3, 1, 1, 2, 3, 2],
-#     [2, 1, 1, 3, 2, 2, 1, 2, 3, 2, 2, 2, 2],
-#     [2, 1, 2, 2, 2, 1, 1, 0, 2, 2, 2, 0, 2],
-#     [3, 1, 0, 2, 2, 2, 1, 1, 0, 0, 3, 2, 2],
-#     [3, 2, 3, 0, 2, 2, 2, 1, 1, 3, 2, 2, 2],
-#     [2, 0, 1, 0, 2, 2, 1, 1, 1, 0, 2, 0, 2],
-#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-# ]
-
 maze=[
-    [3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2],
-    [2, 1, 0, 2, 2, 2, 2, 3, 2, 1, 2],
-    [3, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2],
-    [2, 2, 2, 1, 1, 1, 2, 1, 3, 1, 2],
-    [2, 1, 3, 3, 0, 2, 1, 0, 0, 2, 2],
-    [2, 2, 2, 0, 2, 2, 0, 1, 1, 2, 2],
-    [2, 2, 2, 3, 1, 2, 3, 1, 2, 0, 2],
-    [2, 2, 1, 2, 2, 1, 0, 2, 1, 2, 2],
-    [2, 3, 0, 2, 1, 1, 3, 1, 0, 2, 2],
-    [2, 1, 1, 1, 0, 3, 0, 3, 1, 0, 2],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2],
+    [2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2],
+    [2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2],
+    [2, 3, 1, 1, 1, 0, 1, 0, 2, 0, 0, 2, 2],
+    [2, 1, 1, 1, 1, 2, 3, 1, 0, 1, 2, 2, 2],
+    [3, 2, 1, 1, 1, 2, 3, 1, 1, 1, 2, 0, 2],
+    [2, 1, 1, 1, 0, 2, 0, 3, 1, 1, 2, 3, 2],
+    [2, 1, 1, 3, 2, 2, 1, 2, 3, 2, 2, 2, 2],
+    [2, 1, 2, 2, 2, 1, 1, 0, 2, 2, 2, 0, 2],
+    [3, 1, 0, 2, 2, 2, 1, 1, 0, 0, 3, 2, 2],
+    [3, 2, 3, 0, 2, 2, 2, 1, 1, 3, 2, 2, 2],
+    [2, 0, 1, 0, 2, 2, 1, 1, 1, 0, 2, 0, 2],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
 ]
+
+# maze=[
+#     [3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2],
+#     [2, 1, 0, 2, 2, 2, 2, 3, 2, 1, 2],
+#     [3, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2],
+#     [2, 2, 2, 1, 1, 1, 2, 1, 3, 1, 2],
+#     [2, 1, 3, 3, 0, 2, 1, 0, 0, 2, 2],
+#     [2, 2, 2, 0, 2, 2, 0, 1, 1, 2, 2],
+#     [2, 2, 2, 3, 1, 2, 3, 1, 2, 0, 2],
+#     [2, 2, 1, 2, 2, 1, 0, 2, 1, 2, 2],
+#     [2, 3, 0, 2, 1, 1, 3, 1, 0, 2, 2],
+#     [2, 1, 1, 1, 0, 3, 0, 3, 1, 0, 2],
+#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+# ]
 
 
 def neighbors(y,x,bias="None"):
@@ -406,12 +406,12 @@ for i in range(len(maze)):
     for k in range(len(maze[0])):
             working_list.append(0)
     memory.append(working_list)
-goal_coords=[3,3]#y,x
+goal_coords=[10,10]#y,x
 start_coords=[0,0]
 current_position=copy.deepcopy(start_coords)
-#print_matrix(memory)
-# output=maze_distance(maze,goal_coords[0],goal_coords[1]) #print distances
-# print_grid(output[1],output[0]) #print distances
+print_matrix(memory)
+output=maze_distance(maze,goal_coords[0],goal_coords[1]) #print distances
+print_grid(output[1],output[0]) #print distances
 turtle.width(1)
 #draw_maze(maze)
 turtle.width(4)
@@ -419,12 +419,12 @@ draw_start_and_end(start_coords,goal_coords)
 turtle.setpos(start_coords[1]*maze_scale+maze_scale*.5+turtle_offset[1],-1*(start_coords[0]*maze_scale+maze_scale*.5)+turtle_offset[0])
 turtle.speed(2)
 current_color="blue"
-memory=maze
+# memory=maze
 print("Navigating to goal")
 navigate(goal_coords)
-# print("Navigating back to start")
-# current_color="yellow"
-# navigate(start_coords)
+print("Navigating back to start")
+current_color="yellow"
+navigate(start_coords)
 
 # current_color="red"
 # sprint(goal_coords)

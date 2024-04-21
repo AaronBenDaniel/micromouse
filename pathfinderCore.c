@@ -21,13 +21,56 @@
 // // Free the allocated memory for the rows
 // free(visited);
 
+#define START_Y 0
+#define START_X 0
+#define START_DIRECTION RIGHT
+#define GOAL_Y 10
+#define GOAL_X 10
+
 #define RIGHT 0
 #define UP 1
 #define LEFT 2
 #define DOWN 3
 #define NOMOVE -1
-#define MAXMAZESIZE 11
+#define MAXMAZESIZE 13
 #define MAXDISTANCE 1000
+
+int maze[MAXMAZESIZE][MAXMAZESIZE]={
+    // {3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2},
+    // {2, 2, 3, 1, 2, 2, 1, 3, 1, 2, 2, 3, 0, 3, 1, 2, 1, 3, 1, 1, 2},
+    // {2, 2, 2, 2, 2, 3, 0, 3, 0, 2, 2, 2, 3, 0, 2, 1, 1, 0, 3, 0, 2},
+    // {2, 0, 2, 2, 2, 1, 1, 2, 2, 0, 0, 2, 2, 2, 2, 3, 1, 1, 0, 3, 2},
+    // {3, 1, 0, 2, 1, 0, 2, 2, 1, 2, 1, 0, 2, 1, 2, 3, 1, 2, 1, 0, 2},
+    // {2, 1, 3, 1, 3, 1, 2, 3, 0, 3, 1, 1, 1, 0, 2, 2, 2, 1, 2, 3, 2},
+    // {3, 2, 2, 1, 0, 2, 0, 2, 3, 1, 1, 0, 3, 1, 1, 2, 3, 0, 2, 0, 2},
+    // {2, 0, 3, 1, 1, 1, 2, 2, 1, 0, 2, 0, 3, 2, 2, 0, 2, 1, 2, 1, 2},
+    // {2, 3, 1, 2, 3, 0, 2, 2, 3, 1, 1, 0, 0, 2, 3, 1, 1, 2, 1, 0, 2},
+    // {2, 0, 2, 1, 2, 3, 0, 3, 0, 3, 1, 2, 2, 0, 2, 1, 2, 1, 3, 0, 2},
+    // {2, 1, 3, 0, 0, 2, 1, 0, 3, 2, 0, 2, 2, 1, 3, 2, 3, 0, 0, 3, 2},
+    // {3, 2, 1, 3, 1, 3, 0, 1, 0, 1, 2, 3, 1, 2, 2, 0, 3, 1, 2, 2, 2},
+    // {2, 3, 0, 2, 2, 1, 1, 2, 3, 1, 0, 2, 2, 1, 2, 1, 2, 1, 2, 0, 2},
+    // {2, 0, 2, 2, 3, 1, 2, 1, 0, 3, 3, 1, 1, 2, 1, 0, 3, 0, 2, 1, 2},
+    // {3, 3, 0, 2, 1, 2, 1, 3, 1, 0, 2, 1, 2, 3, 1, 2, 2, 1, 2, 2, 2},
+    // {2, 2, 1, 1, 0, 2, 2, 2, 1, 2, 3, 0, 1, 2, 2, 0, 3, 0, 0, 2, 2},
+    // {2, 1, 1, 3, 1, 2, 2, 1, 0, 2, 1, 3, 0, 0, 3, 1, 2, 2, 3, 2, 2},
+    // {2, 1, 1, 2, 2, 0, 1, 1, 1, 2, 2, 0, 3, 1, 2, 2, 0, 2, 2, 0, 2},
+    // {2, 2, 2, 2, 2, 1, 0, 3, 0, 2, 3, 1, 1, 0, 2, 3, 1, 2, 2, 3, 2},
+    // {2, 0, 2, 0, 3, 1, 1, 0, 3, 0, 2, 1, 1, 1, 0, 2, 2, 0, 2, 0, 2},
+    // {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
+    {3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2},
+    {2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2},
+    {2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2},
+    {2, 3, 1, 1, 1, 0, 1, 0, 2, 0, 0, 2, 2},
+    {2, 1, 1, 1, 1, 2, 3, 1, 0, 1, 2, 2, 2},
+    {3, 2, 1, 1, 1, 2, 3, 1, 1, 1, 2, 0, 2},
+    {2, 1, 1, 1, 0, 2, 0, 3, 1, 1, 2, 3, 2},
+    {2, 1, 1, 3, 2, 2, 1, 2, 3, 2, 2, 2, 2},
+    {2, 1, 2, 2, 2, 1, 1, 0, 2, 2, 2, 0, 2},
+    {3, 1, 0, 2, 2, 2, 1, 1, 0, 0, 3, 2, 2},
+    {3, 2, 3, 0, 2, 2, 2, 1, 1, 3, 2, 2, 2},
+    {2, 0, 1, 0, 2, 2, 1, 1, 1, 0, 2, 0, 2},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
+};
 
 //initialize distances matrix
 int distances[MAXMAZESIZE][MAXMAZESIZE];
@@ -45,14 +88,16 @@ int current_direction;
 void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     printf("Matrix:\n");
     for (int i = 0; i < MAXMAZESIZE; i++) {
+        printf("{");
         for (int j = 0; j < MAXMAZESIZE ; j++) {
             if(matrix[i][j]!=MAXDISTANCE){
-                printf("%d ", matrix[i][j]);
+                printf("%d, ", matrix[i][j]);
             }
             else{
                 printf(". ");
             }
         }
+        printf("},");
         printf("\n");
     }
 }
@@ -142,7 +187,7 @@ void neighbors(int y,int x,int bias,int *pointer){
 void maze_distances(int start_y,int start_x){
     void recurse(int y,int x){
         //check if cell is in bounds
-        if(!(y>=0 && y<MAXMAZESIZE && x>=0 && x<MAXMAZESIZE)){
+        if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
             return;
         }
         //determine distance
@@ -158,7 +203,7 @@ void maze_distances(int start_y,int start_x){
             cell_x=neighboring_cells_recurse[1+3*i];
             cell_direction=neighboring_cells_recurse[2+3*i];
             //check if cell is in bounds
-            if(!(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE)){
+            if(!(cell_y>=0 && cell_y<MAXMAZESIZE-1 && cell_x>=0 && cell_x<MAXMAZESIZE-1)){
                 continue;
             }
             if(lowest_distance>distances[cell_y][cell_x]){ //is there a neighbor with a lower distance? POTENTIAL OPTIMIZATON: add "-1" to lowest_distance
@@ -195,7 +240,7 @@ void maze_distances(int start_y,int start_x){
         }
     }
     //check if start cell is in bounds
-    if(!(start_y>=0 && start_y<MAXMAZESIZE && start_x>=0 && start_x<MAXMAZESIZE)){
+    if(!(start_y>=0 && start_y<MAXMAZESIZE-1 && start_x>=0 && start_x<MAXMAZESIZE-1)){
         printf("INVALID START CELL\n");
     }
     //initialize distances matrix to all MAXDISTANCE
@@ -260,9 +305,48 @@ int next_move(int target_y,int target_x){
     return NOMOVE;
 }
 
-//WRITE ME!
+//NEEDS HARDWARE INTERFACE
 void measure(){
-    ;
+    //Debug
+    //load the maze into memory
+    // for(int i=0;i<MAXMAZESIZE;i++){
+    //     for(int j=0;j<MAXMAZESIZE;j++){
+    //         memory[i][j]=maze[i][j];
+    //     }
+    // }
+
+    //THERE'S SOMETHING WRONG WITH THE CODE BELOW (I THINK)
+    //WHEN I COMMENT IT OUT AND REPLACE IT WITH THE ABOVE CODE, EVERYTHING WORKS
+    //(but of course the mouse can see the whole maze from the start)
+
+    //Temporary development code
+    //Check what's visible to the mouse and store it into memory
+    memory[current_y][current_x]=maze[current_y][current_x];
+    //Is there a wall below the mouse
+    if(maze[current_y+1][current_x]==1 || maze[current_y+1][current_x]==3){
+        //store the presence of a wall into memory
+        if(memory[current_y+1][current_x]!=3){
+            if(memory[current_y+1][current_x]==2){
+                memory[current_y+1][current_x]=3;
+            }
+            else{
+                memory[current_y+1][current_x]=1;
+            }
+        }
+    }
+    //Is there a wall to the right of the mouse
+    if(maze[current_y][current_x+1]==2 || maze[current_y][current_x+1]==3){
+        //store the presence of a wall into memory
+        if(memory[current_y][current_x+1]!=3){
+            if(memory[current_y][current_x+1]==1){
+                memory[current_y][current_x+1]=3;
+            }
+            else{
+                memory[current_y][current_x+1]=2;
+            }
+        }
+    }
+    //Real code goes here (eventually)
 }
 
 //NEEDS HARDWARE INTERFACE
@@ -350,8 +434,10 @@ void make_move(int move,int number){
             }
         break;
     }
-    for(int i=0;i<number;i++){
-        forward();
+    if(move!=NOMOVE){
+        for(int i=0;i<number;i++){
+            forward();
+        }
     }
 }
 
@@ -361,15 +447,16 @@ void navigate(int target_y,int target_x){
     while(move!=NOMOVE){
         move=next_move(target_y,target_x);
         make_move(move,1);
+        printf("Made move: \"");
         print_move(move);
-        printf("\n");
+        printf("\"\nCurrent coordinates are [%d,%d]\n\n",current_y,current_x);
         measure();
     }
     printf("Done!\n");
 }
 
 void sprint(int start_y,int start_x,int objective_y,int objective_x){
-    printf("Returning to start!\n");
+    printf("Returning to start\n");
     navigate(start_y,start_x);
     int real_y=current_y;
     int real_x=current_x;
@@ -377,6 +464,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     int moves[MAXDISTANCE];
     int move=0;
     int move_counter=0;
+    printf("Calculating shortest path\n");
     while(move!=NOMOVE){
         move=next_move(objective_y,objective_x);
         switch(move){
@@ -401,7 +489,11 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         move_counter++;
     }
     int path_length=move_counter;
+    current_y=real_y;
+    current_x=real_x;
+    current_direction=real_direction;
     move_counter=1;
+    printf("Sprint!\n");
     for(int i=1;i<=path_length;i++){
         if(moves[i]==moves[i-1]){
             move_counter++;
@@ -412,45 +504,19 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         }
         if(move_counter==1){
             print_move(moves[i-1]);
+            printf(" [%d,%d]",current_y,current_x);
             printf("\n");
         }
         else{
             print_move(moves[i-1]);
-            printf(" %d times\n",move_counter);
+            printf(" %d times",move_counter);
+            printf(" [%d,%d]\n",current_y,current_x);
         }
         move_counter=1;
     }
 }  
 
 int main(){
-    int maze[MAXMAZESIZE][MAXMAZESIZE]={
-    {3, 1, 3, 1, 3, 3, 1, 1, 1, 1, 2},
-    {2, 1, 0, 2, 2, 2, 2, 3, 2, 1, 2},
-    {3, 1, 1, 0, 2, 0, 2, 2, 1, 0, 2},
-    {2, 2, 2, 1, 1, 1, 2, 1, 3, 1, 2},
-    {2, 1, 3, 3, 0, 2, 1, 0, 0, 2, 2},
-    {2, 2, 2, 0, 2, 2, 0, 1, 1, 2, 2},
-    {2, 2, 2, 3, 1, 2, 3, 1, 2, 0, 2},
-    {2, 2, 1, 2, 2, 1, 0, 2, 1, 2, 2},
-    {2, 3, 0, 2, 1, 1, 3, 1, 0, 2, 2},
-    {2, 1, 1, 1, 0, 3, 0, 3, 1, 0, 2},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-};
-
-    // int maze[MAXMAZESIZE][MAXMAZESIZE]={
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    // };
-
 //initialize distances matrix to all MAXDISTANCE
 for(int i=0;i<MAXMAZESIZE;i++){
     for(int j=0;j<MAXMAZESIZE;j++){
@@ -472,20 +538,17 @@ for(int i=0;i<MAXMAZESIZE;i++){
     }
 }
 
-//load the maze into memory
-for(int i=0;i<MAXMAZESIZE;i++){
-    for(int j=0;j<MAXMAZESIZE;j++){
-        memory[i][j]=maze[i][j];
-    }
-}
+// for(int i=0;i<MAXMAZESIZE;i++){
+//     for(int j=0;j<MAXMAZESIZE;j++){
+//         memory[i][j]=maze[i][j];
+//     }
+// }
 
-int start_y=0;
-int start_x=0;
-int start_direction=RIGHT;
-int goal_y=3;
-int goal_x=3;
-current_y=start_y;
-current_x=start_x;
-current_direction=start_direction;
-sprint(start_y,start_x,goal_y,goal_x);
+current_y=START_Y;
+current_x=START_X;
+current_direction=START_DIRECTION;
+navigate(GOAL_Y,GOAL_X);
+navigate(START_Y,START_X);
+// sprint(START_Y,START_X,GOAL_Y,GOAL_X);
+print_matrix(memory);
 }
