@@ -312,9 +312,6 @@ void make_move(int move,int number){
             if(current_direction==DOWN){
                 turn_left();
             }
-            for(int i=0;i<number;i++){
-                forward();
-            }
         break;
         case UP:
             if(current_direction==RIGHT){
@@ -326,9 +323,6 @@ void make_move(int move,int number){
             if(current_direction==DOWN){
                 turn_right();
                 turn_right();
-            }
-            for(int i=0;i<number;i++){
-                forward();
             }
         break;
         case LEFT:
@@ -342,9 +336,6 @@ void make_move(int move,int number){
             if(current_direction==DOWN){
                 turn_right();
             }
-            for(int i=0;i<number;i++){
-                forward();
-            }
         break;
         case DOWN:
             if(current_direction==RIGHT){
@@ -357,10 +348,10 @@ void make_move(int move,int number){
             if(current_direction==LEFT){
                 turn_left();
             }
-            for(int i=0;i<number;i++){
-                forward();
-            }
         break;
+    }
+    for(int i=0;i<number;i++){
+        forward();
     }
 }
 
@@ -411,27 +402,25 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     }
     int path_length=move_counter;
     move_counter=1;
-    //REFACTOR EVERYTHING BELOW
-    int previous_move=NOMOVE;
-    for(int i=0;i<=path_length;i++){
-        if(moves[i]==previous_move){
+    for(int i=1;i<=path_length;i++){
+        if(moves[i]==moves[i-1]){
             move_counter++;
-            previous_move=moves[i];
             continue;
         }
-        make_move(previous_move,move_counter);
+        else{
+            make_move(moves[i-1],move_counter);
+        }
         if(move_counter==1){
-            print_move(previous_move);
+            print_move(moves[i-1]);
             printf("\n");
         }
         else{
-            print_move(previous_move);
+            print_move(moves[i-1]);
             printf(" %d times\n",move_counter);
         }
-        previous_move=moves[i];
         move_counter=1;
     }
-}
+}  
 
 int main(){
     int maze[MAXMAZESIZE][MAXMAZESIZE]={
