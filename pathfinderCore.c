@@ -164,7 +164,7 @@ void neighbors(int y,int x,int bias,int *pointer){
             pointer[7] = x;
             pointer[8] = UP;
             pointer[9] = y;
-            pointer[10] = x-1;
+            pointer[10] = x+1;
             pointer[11] = RIGHT;
         break;
         case DOWN:
@@ -282,26 +282,25 @@ int next_move(int target_y,int target_x){
         cell_x=neighbors_next_move[1+3*i];
         cell_direction=neighbors_next_move[2+3*i];
         //check if cell is in bounds
-        if(!(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE)){
-            continue;
-        }
-        //check if cell has a lower distance
-        if(!(distances[cell_y][cell_x]<current_distance)){
-            continue;
-        }
-        if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
-            return RIGHT;
-        }
-        if(cell_direction==UP && memory[current_y][current_x]!=1 && memory[current_y][current_x]!=3){
-            return UP;
-        }
-        if(cell_direction==LEFT && memory[current_y][current_x]!=2 && memory[current_y][current_x]!=3){
-            return LEFT;
-        }   
-        if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
-            return DOWN;
+        if(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE){
+            //check if cell has a lower distance
+            if(distances[cell_y][cell_x]<current_distance){
+                if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
+                    return RIGHT;
+                }
+                if(cell_direction==UP && memory[current_y][current_x]!=1 && memory[current_y][current_x]!=3){
+                    return UP;
+                }
+                if(cell_direction==LEFT && memory[current_y][current_x]!=2 && memory[current_y][current_x]!=3){
+                    return LEFT;
+                }   
+                if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
+                    return DOWN;
+                }
+            }
         }
     }
+    printf("UNSOLVABLE MAZE\n");
     return NOMOVE;
 }
 
@@ -314,10 +313,6 @@ void measure(){
     //         memory[i][j]=maze[i][j];
     //     }
     // }
-
-    //THERE'S SOMETHING WRONG WITH THE CODE BELOW (I THINK)
-    //WHEN I COMMENT IT OUT AND REPLACE IT WITH THE ABOVE CODE, EVERYTHING WORKS
-    //(but of course the mouse can see the whole maze from the start)
 
     //Temporary development code
     //Check what's visible to the mouse and store it into memory
@@ -447,9 +442,9 @@ void navigate(int target_y,int target_x){
     while(move!=NOMOVE){
         move=next_move(target_y,target_x);
         make_move(move,1);
-        printf("Made move: \"");
+        printf("\nMade move: \"");
         print_move(move);
-        printf("\"\nCurrent coordinates are [%d,%d]\n\n",current_y,current_x);
+        printf("\"\nCurrent coordinates are [%d,%d]\n",current_y,current_x);
         measure();
     }
     printf("Done!\n");
@@ -464,7 +459,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     int moves[MAXDISTANCE];
     int move=0;
     int move_counter=0;
-    printf("Calculating shortest path\n");
+    printf("\nCalculating shortest path\n");
     while(move!=NOMOVE){
         move=next_move(objective_y,objective_x);
         switch(move){
@@ -488,12 +483,13 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         moves[move_counter]=move;
         move_counter++;
     }
+    printf("Done!\n");
     int path_length=move_counter;
     current_y=real_y;
     current_x=real_x;
     current_direction=real_direction;
     move_counter=1;
-    printf("Sprint!\n");
+    printf("\nSprint!\n");
     for(int i=1;i<=path_length;i++){
         if(moves[i]==moves[i-1]){
             move_counter++;
@@ -514,6 +510,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         }
         move_counter=1;
     }
+    printf("Done!\n");
 }  
 
 int main(){
@@ -538,23 +535,9 @@ for(int i=0;i<MAXMAZESIZE;i++){
     }
 }
 
-// for(int i=0;i<MAXMAZESIZE;i++){
-//     for(int j=0;j<MAXMAZESIZE;j++){
-//         memory[i][j]=maze[i][j];
-//     }
-// }
-
-//ALL IT TAKES TO MAKE IT WORK IS TO UNCOMMENT THE ABOVE BLOCK OF CODE,
-//IT LOADS THE FULL MAZE INTO THE MOUSE'S MEMORY.
-//IT'S PROBABLY AN ISSUE WITH WRITING TO MEMORY,
-//BUT CLEARLY IT'S NOT OVERWRITTING GOOD MEMORY,
-//AS THIS ONLY NEEDS TO GET EXECUTED ONCE
-
 current_y=START_Y;
 current_x=START_X;
 current_direction=START_DIRECTION;
 navigate(GOAL_Y,GOAL_X);
-navigate(START_Y,START_X);
-// sprint(START_Y,START_X,GOAL_Y,GOAL_X);
-print_matrix(memory);
+sprint(START_Y,START_X,GOAL_Y,GOAL_X);
 }
