@@ -177,6 +177,8 @@ void neighbors(int y,int x,int bias,int *pointer){
     }
 }
 
+//The primary function that allows the mouse to work
+//It takes a position and calculates the number of moves away from that position every cell in the maze is
 void maze_distances(int start_y,int start_x){
     //initialize visited matrix
     int visited[MAXMAZESIZE][MAXMAZESIZE];
@@ -188,15 +190,19 @@ void maze_distances(int start_y,int start_x){
         }
     }
 
+    //recursive function that is called for every cell
     void recurse(int y,int x){
         //check if cell is in bounds
         if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
             return;
         }
-        //determine distance
+        //Determines the distance the current cell is from the given position
         int lowest_distance=distances[y][x];
+        //get list of all neighboring cells
         int neighboring_cells_recurse[12];
         neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
+        //initializes some variables
+        //these aren't really necessary, but they improve code readability
         int cell_y;
         int cell_x;
         int cell_direction;
@@ -209,7 +215,8 @@ void maze_distances(int start_y,int start_x){
             if(!(cell_y>=0 && cell_y<MAXMAZESIZE-1 && cell_x>=0 && cell_x<MAXMAZESIZE-1)){
                 continue;
             }
-            if(lowest_distance>distances[cell_y][cell_x]){ //is there a neighbor with a lower distance? POTENTIAL OPTIMIZATON: add "-1" to lowest_distance
+            //is there a reachable neighbor with a lower distance?
+            if(lowest_distance>distances[cell_y][cell_x]){// POTENTIAL OPTIMIZATON: add "-1" to lowest_distance
                 //determine if there is a wall inbetween the current cell and the neighbor
                 if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
                     lowest_distance=distances[cell_y][cell_x];
@@ -229,11 +236,14 @@ void maze_distances(int start_y,int start_x){
                 }
             }
         }
+        //Major optimization - it checks if the new distances is lower than what it previously had
+        //if it wasn't, then we know that the program had already moved through this area and it already calculated all of the distances
         if(!(distances[y][x]<visited[y][x])){
             return;
         }
+        //Everything below this line will execute if a lower distance was calculated
         visited[y][x]=distances[y][x];
-        //recurse
+        //Runs the recurse() function on all neighboring cells
         for(int i=0;i<4;i++){
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
@@ -258,14 +268,19 @@ void maze_distances(int start_y,int start_x){
             visited[i][j]=MAXDISTANCE;
         }
     }
+    //set start cell in distances matrix to 0
     distances[start_y][start_x]=0;
+    //get a list of neighboring cells to the start cell
     int neighboring_cells[12];
     neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
+    //run the recursive function on all of the neighboring cells
     for(int i=0;i<4;i++){
         recurse(neighboring_cells[0+3*i],neighboring_cells[1+3*i]);
     }
 }
 
+//This function determines the best next move for the mouse to take
+//It takes a target position and returns the best move to make
 int next_move(int target_y,int target_x){
     //are we already at the target coords
     if(current_y==target_y && current_x==target_x){
@@ -275,11 +290,12 @@ int next_move(int target_y,int target_x){
     maze_distances(target_y,target_x);
     int current_distance=distances[current_y][current_x];
     int neighbors_next_move[12];
+    //these aren't really necessary, but they improve code readability
     int cell_y;
     int cell_x;
     int cell_direction;
     neighbors(current_y,current_x,current_direction,neighbors_next_move);
-    //check to find lower reachable distance
+    //check to find a reachable neighbor with a lower distance
     for(int i=0;i<4;i++){
         cell_y=neighbors_next_move[0+3*i];
         cell_x=neighbors_next_move[1+3*i];
@@ -288,6 +304,7 @@ int next_move(int target_y,int target_x){
         if(cell_y>=0 && cell_y<MAXMAZESIZE && cell_x>=0 && cell_x<MAXMAZESIZE){
             //check if cell has a lower distance
             if(distances[cell_y][cell_x]<current_distance){
+                //check if cell is reachable
                 if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
                     return RIGHT;
                 }
@@ -303,6 +320,9 @@ int next_move(int target_y,int target_x){
             }
         }
     }
+    //This ideally should never be executed
+    //The mouse should never be put in an unsolvable maze
+    //(what would the point even be?)
     printf("UNSOLVABLE MAZE\n");
     return NOMOVE;
 }
@@ -345,43 +365,57 @@ void measure(){
         }
     }
     //Real code goes here (eventually)
+    //This will query the reflectance sensors to see if there are any walls at the mouse's current position
 }
 
 //NEEDS HARDWARE INTERFACE
-void forward(){
-    switch(current_direction){
-        case RIGHT:
-        current_x++;
-        break;
-        case UP:
-        current_y--;
-        break;
-        case LEFT:
-        current_x--;
-        break;
-        case DOWN:
-        current_y++;
-        break;
+//Moves the mouse forward a given number of cells
+void forward(int number){
+    for(int i=0;i<number;i++){
+        switch(current_direction){
+            case RIGHT:
+            current_x++;
+            break;
+            case UP:
+            current_y--;
+            break;
+            case LEFT:
+            current_x--;
+            break;
+            case DOWN:
+            current_y++;
+            break;
+        }
     }
+    //This will actually command the motors to turn on in a certain direction for a certain amount of time
 }
 
 //NEEDS HARDWARE INTERFACE
+//Turns the mouse 90 degrees right
 void turn_right(){
     current_direction=current_direction-1;
+    //accounts for overflow
+    //I.E. if the direction was 0, turning right makes the direction -1, but we want that to stay within 0-3
     while(current_direction<0){
         current_direction=current_direction+4;
     }
+    //This will actually command the motors to turn on in a certain direction for a certain amount of time 
 }
 
 //NEEDS HARDWARE INTERFACE
 void turn_left(){
     current_direction=current_direction+1;
+    //accounts for overflow
+    //I.E. if the direction was 3, turning left makes the direction 4, but we want that to stay within 0-3
     while(current_direction>3){
         current_direction=current_direction-4;
     }
+    //This will actually command the motors to turn on in a certain direction for a certain amount of time
 }
 
+//This function takes a move, positions the mouse to make it, and then makes the move
 void make_move(int move,int number){
+    //Turns the mouse to face the proper direction
     switch(move){
         case RIGHT:
             if(current_direction==UP){
@@ -432,13 +466,13 @@ void make_move(int move,int number){
             }
         break;
     }
+    //Goes forward
     if(move!=NOMOVE){
-        for(int i=0;i<number;i++){
-            forward();
-        }
+        forward(number);
     }
 }
 
+//The main high-level function that gets the mouse from point A to point B
 void navigate(int target_y,int target_x){
     measure();
     int move=0;
