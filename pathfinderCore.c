@@ -1,32 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-//dynamic initialization of matrix \/
-//
-// //initialize visited matrix to all MAXDISTANCE
-// // Allocate memory for the rows
-// int **visited;
-// visited = (int **)calloc(MAXMAZESIZE, sizeof(int *));
-// // Allocate memory for each x position in the row
-// for (int i = 0; i < MAXMAZESIZE; i++) {
-//     visited[i] = (int *)calloc(MAXMAZESIZE, sizeof(int));
-// }
-//
-//CODE HERE
-//
-// // Free the allocated memory for each row
-// for (int i = 0; i < MAXMAZESIZE; i++) {
-//     free(visited[i]);
-// }
-// // Free the allocated memory for the rows
-// free(visited);
-
+//Edit these variables to alter the behavior of the mouse
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
 #define GOAL_Y 10
 #define GOAL_X 10
 
+//DO NOT EDIT ANY CODE BELOW THIS LINE
+
+#include <stdio.h>
+
+//Defines macros to use for better code readability
+//also for easily changing the parameters of the maze
 #define RIGHT 0
 #define UP 1
 #define LEFT 2
@@ -35,6 +19,8 @@
 #define MAXMAZESIZE 13
 #define MAXDISTANCE 1000
 
+//This maze is only used for debugging purposes
+//The mouse will never access this maze during operation
 int maze[MAXMAZESIZE][MAXMAZESIZE]={
     // {3, 3, 1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2},
     // {2, 2, 3, 1, 2, 2, 1, 3, 1, 2, 2, 3, 0, 3, 1, 2, 1, 3, 1, 1, 2},
@@ -72,19 +58,19 @@ int maze[MAXMAZESIZE][MAXMAZESIZE]={
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
 };
 
+//Global variables that need to be accessed by multiple fucntions
 //initialize distances matrix
 int distances[MAXMAZESIZE][MAXMAZESIZE];
-
-//initialize visited matrix
-int visited[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize memory matrix
 int memory[MAXMAZESIZE][MAXMAZESIZE];
 
+//initialize position varaibles
 int current_y;
 int current_x;
 int current_direction;
 
+//Debug function for printing a matrix in a human-readable manner
 void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     printf("Matrix:\n");
     for (int i = 0; i < MAXMAZESIZE; i++) {
@@ -102,6 +88,10 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     }
 }
 
+//Debug function for printing a move
+//Moves are stored as integers -1 to 4
+//In the code, #defines are used, but those don't work in the terminal
+//This function converts them into readable strings
 void print_move(int move){
     switch(move){
         case RIGHT:
@@ -122,6 +112,9 @@ void print_move(int move){
     }
 }
 
+//Function that returns a list[12] of the neighboring cells to an input cell
+//format: y_coord,x_coord,direction,[...],y_coord,x_coord,direction
+//can take a bias to change the order of the output 
 //make sure to initialize a variable to recieve results into first
 void neighbors(int y,int x,int bias,int *pointer){
     switch(bias){
@@ -185,6 +178,16 @@ void neighbors(int y,int x,int bias,int *pointer){
 }
 
 void maze_distances(int start_y,int start_x){
+    //initialize visited matrix
+    int visited[MAXMAZESIZE][MAXMAZESIZE];
+
+    //initialize visited matrix to all MAXDISTANCE
+    for(int i=0;i<MAXMAZESIZE;i++){
+        for(int j=0;j<MAXMAZESIZE;j++){
+            visited[i][j]=MAXDISTANCE;
+        }
+    }
+
     void recurse(int y,int x){
         //check if cell is in bounds
         if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
@@ -518,13 +521,6 @@ int main(){
 for(int i=0;i<MAXMAZESIZE;i++){
     for(int j=0;j<MAXMAZESIZE;j++){
         distances[i][j]=MAXDISTANCE;
-    }
-}
-
-//initialize visited matrix to all MAXDISTANCE
-for(int i=0;i<MAXMAZESIZE;i++){
-    for(int j=0;j<MAXMAZESIZE;j++){
-        visited[i][j]=MAXDISTANCE;
     }
 }
 
