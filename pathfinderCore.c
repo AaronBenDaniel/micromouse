@@ -1,4 +1,4 @@
-//Edit these variables to alter the behavior of the mouse
+//Edit these defines to alter the behavior of the mouse
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
@@ -415,6 +415,10 @@ void turn_left(){
 
 //This function takes a move, positions the mouse to make it, and then makes the move
 void make_move(int move,int number){
+    //don't do anything if the move in NOMOVE
+    if(move==NOMOVE){
+        return;
+    }
     //Turns the mouse to face the proper direction
     switch(move){
         case RIGHT:
@@ -466,10 +470,8 @@ void make_move(int move,int number){
             }
         break;
     }
-    //Goes forward
-    if(move!=NOMOVE){
-        forward(number);
-    }
+    //goes forward
+    forward(number);
 }
 
 //The main high-level function that gets the mouse from point A to point B
@@ -477,7 +479,7 @@ void navigate(int target_y,int target_x){
     //Measures it's surroundings in the beginning
     measure();
     int move=0;
-    //while loop continuously calculates the best next move, makes it, and then meaures it's surroundings
+    //while loop continuously to calculate the best next move, makes it, and then measure its surroundings
     while(move!=NOMOVE){
         move=next_move(target_y,target_x);
         make_move(move,1);
@@ -492,7 +494,7 @@ void navigate(int target_y,int target_x){
 //This function gets the mouse from the start to the goal as fast as possible
 //This is used to make the actual attempt at traversing the maze in record time
 void sprint(int start_y,int start_x,int objective_y,int objective_x){
-    //gets the mouse back the the start
+    //gets the mouse back to the start
     printf("Returning to start\n");
     navigate(start_y,start_x);
     //store current position and direction
@@ -505,8 +507,9 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     int move_counter=0;
     printf("\nCalculating shortest path\n");
     while(move!=NOMOVE){
-        //calculate the best next move, virtually execute the move, store it, and repeat until at the goal
+        //calculate the best next move
         move=next_move(objective_y,objective_x);
+        //virtually execute the move
         switch(move){
             case RIGHT:
                 current_direction=0;
@@ -525,6 +528,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
                 current_y++;
             break;
         }
+        //store the move
         moves[move_counter]=move;
         move_counter++;
     }
@@ -544,6 +548,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         if(moves[i]==moves[i-1]){
             //increment the move counter
             move_counter++;
+            //goes to next move
             continue;
         }
         else{
@@ -562,6 +567,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
             printf(" %d times",move_counter);
             printf(" [%d,%d]\n",current_y,current_x);
         }
+        //reset move counter
         move_counter=1;
     }
     printf("Done!\n");
@@ -582,9 +588,13 @@ for(int i=0;i<MAXMAZESIZE;i++){
     }
 }
 
+//set the current position and direction to the starting values
 current_y=START_Y;
 current_x=START_X;
 current_direction=START_DIRECTION;
+
+//high-level behavior
+//currently it will behave like a Micromouse would in the competition
 navigate(GOAL_Y,GOAL_X);
 sprint(START_Y,START_X,GOAL_Y,GOAL_X);
 }
