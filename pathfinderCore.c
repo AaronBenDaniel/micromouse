@@ -474,8 +474,10 @@ void make_move(int move,int number){
 
 //The main high-level function that gets the mouse from point A to point B
 void navigate(int target_y,int target_x){
+    //Measures it's surroundings in the beginning
     measure();
     int move=0;
+    //while loop continuously calculates the best next move, makes it, and then meaures it's surroundings
     while(move!=NOMOVE){
         move=next_move(target_y,target_x);
         make_move(move,1);
@@ -487,17 +489,23 @@ void navigate(int target_y,int target_x){
     printf("Done!\n");
 }
 
+//This function gets the mouse from the start to the goal as fast as possible
+//This is used to make the actual attempt at traversing the maze in record time
 void sprint(int start_y,int start_x,int objective_y,int objective_x){
+    //gets the mouse back the the start
     printf("Returning to start\n");
     navigate(start_y,start_x);
+    //store current position and direction
     int real_y=current_y;
     int real_x=current_x;
     int real_direction=current_direction;
+    //initialize the list of moves
     int moves[MAXDISTANCE];
     int move=0;
     int move_counter=0;
     printf("\nCalculating shortest path\n");
     while(move!=NOMOVE){
+        //calculate the best next move, virtually execute the move, store it, and repeat until at the goal
         move=next_move(objective_y,objective_x);
         switch(move){
             case RIGHT:
@@ -520,27 +528,36 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         moves[move_counter]=move;
         move_counter++;
     }
+    //ADD FEATURE: Make the mouse turn to make the first move pre-emptively
     printf("Done!\n");
     int path_length=move_counter;
+    //restore actual position and direction
     current_y=real_y;
     current_x=real_x;
     current_direction=real_direction;
     move_counter=1;
+    //execute the stored moves as fast as possible
     printf("\nSprint!\n");
+    //IMPORTANT NOTE: for loop starts on the SECOND item in the list
     for(int i=1;i<=path_length;i++){
+        //checks if the current move equals the previous move
         if(moves[i]==moves[i-1]){
+            //increment the move counter
             move_counter++;
             continue;
         }
         else{
+            //makes the move with the number of stored same-direction moves
             make_move(moves[i-1],move_counter);
         }
         if(move_counter==1){
+            //print move normally if it only happened once
             print_move(moves[i-1]);
             printf(" [%d,%d]",current_y,current_x);
             printf("\n");
         }
         else{
+            //if multiple moves were made, print how many times
             print_move(moves[i-1]);
             printf(" %d times",move_counter);
             printf(" [%d,%d]\n",current_y,current_x);
