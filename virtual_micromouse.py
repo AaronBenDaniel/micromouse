@@ -425,8 +425,7 @@ navigate(goal_coords)
 print("Navigating back to start")
 current_color="yellow"
 navigate(start_coords)
-
-# current_color="red"
-# sprint(goal_coords)
+current_color="red"
+sprint(goal_coords)
 
 turtle.done()
