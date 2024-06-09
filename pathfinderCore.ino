@@ -25,7 +25,7 @@
 #define UP 1
 #define LEFT 2
 #define DOWN 3
-#define NOMOVE -1
+#define NOMOVE 4
 #define MAXMAZESIZE 13
 #define MAXDISTANCE 255
 
@@ -49,13 +49,13 @@ uint8_t maze[MAXMAZESIZE][MAXMAZESIZE]={
 
 //Global variables that need to be accessed by multiple functions
 //initialize distances matrix
-int distances[MAXMAZESIZE][MAXMAZESIZE];
+uint8_t distances[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize memory matrix
-int memory[MAXMAZESIZE][MAXMAZESIZE];
+uint8_t memory[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize visited matrix
-int visited[MAXMAZESIZE][MAXMAZESIZE];
+uint8_t visited[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize position variables
 int current_y;
@@ -63,7 +63,7 @@ int current_x;
 int current_direction;
 
 //Debug function for printing a matrix in a human-readable manner
-void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
+void print_matrix(uint8_t matrix[MAXMAZESIZE][MAXMAZESIZE]){
     printf("Matrix:\n");
     for (uint8_t i = 0; i < MAXMAZESIZE; i++) {
         printf("{");
@@ -81,10 +81,10 @@ void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
 }
 
 //Debug function for printing a move
-//Moves are stored as integers -1 to 4
+//Moves are stored as integers 0 to 4
 //In the code, #defines are used, but those don't work in the terminal
 //This function converts them into readable strings
-void print_move(int move){
+void print_move(uint8_t move){
     switch(move){
         case RIGHT:
             printf("Right");
@@ -108,7 +108,7 @@ void print_move(int move){
 //format: y_coord,x_coord,direction,[...],y_coord,x_coord,direction
 //can take a bias to change the order of the output 
 //make sure to initialize a variable to receive results into first
-void neighbors(int y,int x,int bias,int *pointer){
+void neighbors(int y,int x,int bias,uint8_t *pointer){
     switch(bias){
         case RIGHT:
             pointer[0] = y;
@@ -192,7 +192,7 @@ void maze_distances(int start_y,int start_x){
     //set start cell in distances matrix to 0
     distances[start_y][start_x]=0;
     //get a list of neighboring cells to the start cell
-    int neighboring_cells[12];
+    uint8_t neighboring_cells[12];
     neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
     //run the recursive function on all of the neighboring cells
     for(uint8_t i=0;i<4;i++){
@@ -209,7 +209,7 @@ void maze_distances(int start_y,int start_x){
     //Determines the distance the current cell is from the target position
         int lowest_distance=distances[y][x];
         //get list of all neighboring cells
-        int neighboring_cells_recurse[12];
+        uint8_t neighboring_cells_recurse[12];
         neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
         //initializes some variables
     //these aren't technically necessary, but they improve code readability
@@ -278,7 +278,7 @@ int next_move(int target_y,int target_x){
     int cell_y;
     int cell_x;
     int cell_direction;
-    int neighbors_next_move[12];
+    uint8_t neighbors_next_move[12];
     neighbors(current_y,current_x,current_direction,neighbors_next_move); //the bias here is very important, it priorotizes moves that require the least amount of rotation
     //check to find a reachable neighbor with a lower distance
     for(uint8_t i=0;i<4;i++){
@@ -356,7 +356,7 @@ void measure(){
 
 //NEEDS HARDWARE INTERFACE
 //Moves the mouse forward a given number of cells
-void forward(int number){
+void forward(uint8_t number){
     for(uint8_t i=0;i<number;i++){
         switch(current_direction){
             case RIGHT:
@@ -400,7 +400,7 @@ void turn_left(){
 }
 
 //This function takes a move as input, positions the mouse to make it, and then makes the move
-void make_move(int move,int number){
+void make_move(uint8_t move,uint8_t number){
     //don't do anything if the move in NOMOVE
     if(move==NOMOVE){
         return;
@@ -470,7 +470,7 @@ void navigate(int target_y,int target_x){
     turn_right();
     measure();
     turn_left(); //THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
-    int move=0;
+    uint8_t move=0;
     //while loop continuously to calculate the best next move, makes it, and then measure its surroundings
     while(move!=NOMOVE){
         move=next_move(target_y,target_x);
@@ -499,13 +499,13 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     printf("Returning to start\n");
     navigate(start_y,start_x);
     //store current position and direction
-    int real_y=current_y;
-    int real_x=current_x;
-    int real_direction=current_direction;
+    uint8_t real_y=current_y;
+    uint8_t real_x=current_x;
+    uint8_t real_direction=current_direction;
     //initialize the list of moves
-    int moves[MAXDISTANCE];
-    int move=0;
-    int move_counter=0;
+    uint8_t moves[MAXDISTANCE];
+    uint8_t move=0;
+    uint8_t move_counter=0;
     printf("\nCalculating shortest path\n");
     while(move!=NOMOVE){
         //calculate the best next move
