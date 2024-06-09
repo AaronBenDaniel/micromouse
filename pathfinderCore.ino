@@ -31,7 +31,7 @@
 
 //This maze is only used for debugging purposes
 //The mouse will never access this maze during operation
-int maze[MAXMAZESIZE][MAXMAZESIZE]={
+uint8_t maze[MAXMAZESIZE][MAXMAZESIZE]={
     {3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2},
     {2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2},
     {2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2},
@@ -65,9 +65,9 @@ int current_direction;
 //Debug function for printing a matrix in a human-readable manner
 void print_matrix(int matrix[MAXMAZESIZE][MAXMAZESIZE]){
     printf("Matrix:\n");
-    for (int i = 0; i < MAXMAZESIZE; i++) {
+    for (uint8_t i = 0; i < MAXMAZESIZE; i++) {
         printf("{");
-        for (int j = 0; j < MAXMAZESIZE ; j++) {
+        for (uint8_t j = 0; j < MAXMAZESIZE ; j++) {
             if(matrix[i][j]!=MAXDISTANCE){
                 printf("%d, ", matrix[i][j]);
             }
@@ -173,8 +173,8 @@ void neighbors(int y,int x,int bias,int *pointer){
 //It takes a position and calculates the number of moves away from that position every cell in the maze is
 void maze_distances(int start_y,int start_x){
     //initialize distances matrix to all MAXDISTANCE
-    for(int i=0;i<MAXMAZESIZE;i++){
-        for(int j=0;j<MAXMAZESIZE;j++){
+    for(uint8_t i=0;i<MAXMAZESIZE;i++){
+        for(uint8_t j=0;j<MAXMAZESIZE;j++){
             distances[i][j]=MAXDISTANCE;
         }
     }
@@ -184,8 +184,8 @@ void maze_distances(int start_y,int start_x){
         return;
     }
     //initialize visited matrix to all MAXDISTANCE
-    for(int i=0;i<MAXMAZESIZE;i++){
-        for(int j=0;j<MAXMAZESIZE;j++){
+    for(uint8_t i=0;i<MAXMAZESIZE;i++){
+        for(uint8_t j=0;j<MAXMAZESIZE;j++){
             visited[i][j]=MAXDISTANCE;
         }
     }
@@ -195,7 +195,7 @@ void maze_distances(int start_y,int start_x){
     int neighboring_cells[12];
     neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
     //run the recursive function on all of the neighboring cells
-    for(int i=0;i<4;i++){
+    for(uint8_t i=0;i<4;i++){
         recurse(neighboring_cells[0+3*i],neighboring_cells[1+3*i]);
     }
 }
@@ -217,7 +217,7 @@ void maze_distances(int start_y,int start_x){
         int cell_x;
         int cell_direction;
         //check neighbors for a lower distance
-        for(int i=0;i<4;i++){
+        for(uint8_t i=0;i<4;i++){
             //stores values into variables for the current cell
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
@@ -255,7 +255,7 @@ void maze_distances(int start_y,int start_x){
         //Everything below this line will execute if a lower distance was calculated
         visited[y][x]=distances[y][x];
         //Runs the recurse() function on all neighboring cells
-        for(int i=0;i<4;i++){
+        for(uint8_t i=0;i<4;i++){
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
             if(!(distances[cell_y][cell_x]<=lowest_distance)){
@@ -281,7 +281,7 @@ int next_move(int target_y,int target_x){
     int neighbors_next_move[12];
     neighbors(current_y,current_x,current_direction,neighbors_next_move); //the bias here is very important, it priorotizes moves that require the least amount of rotation
     //check to find a reachable neighbor with a lower distance
-    for(int i=0;i<4;i++){
+    for(uint8_t i=0;i<4;i++){
         cell_y=neighbors_next_move[0+3*i];
         cell_x=neighbors_next_move[1+3*i];
         cell_direction=neighbors_next_move[2+3*i];
@@ -357,7 +357,7 @@ void measure(){
 //NEEDS HARDWARE INTERFACE
 //Moves the mouse forward a given number of cells
 void forward(int number){
-    for(int i=0;i<number;i++){
+    for(uint8_t i=0;i<number;i++){
         switch(current_direction){
             case RIGHT:
             current_x++;
@@ -541,7 +541,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     //execute the stored moves as fast as possible
     printf("\nSprint!\n");
     //IMPORTANT NOTE: for loop starts on the SECOND item in the list
-    for(int i=1;i<=path_length;i++){
+    for(uint8_t i=1;i<=path_length;i++){
         //checks if the current move equals the previous move
         if(moves[i]==moves[i-1]){
             //increment the move counter
@@ -573,15 +573,15 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
 
 void setup(){
 //initialize distances matrix to all MAXDISTANCE
-for(int i=0;i<MAXMAZESIZE;i++){
-    for(int j=0;j<MAXMAZESIZE;j++){
+for(uint8_t i=0;i<MAXMAZESIZE;i++){
+    for(uint8_t j=0;j<MAXMAZESIZE;j++){
         distances[i][j]=MAXDISTANCE;
     }
 }
 
 //initialize memory to all 0
-for(int i=0;i<MAXMAZESIZE;i++){
-    for(int j=0;j<MAXMAZESIZE;j++){
+for(uint8_t i=0;i<MAXMAZESIZE;i++){
+    for(uint8_t j=0;j<MAXMAZESIZE;j++){
         memory[i][j]=0;
     }
 }
