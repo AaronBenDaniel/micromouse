@@ -58,9 +58,9 @@ uint8_t memory[MAXMAZESIZE][MAXMAZESIZE];
 uint8_t visited[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize position variables
-int current_y;
-int current_x;
-int current_direction;
+int8_t current_y;
+int8_t current_x;
+int8_t current_direction;
 
 //Debug function for printing a matrix in a human-readable manner
 void print_matrix(uint8_t matrix[MAXMAZESIZE][MAXMAZESIZE]){
@@ -108,7 +108,7 @@ void print_move(uint8_t move){
 //format: y_coord,x_coord,direction,[...],y_coord,x_coord,direction
 //can take a bias to change the order of the output 
 //make sure to initialize a variable to receive results into first
-void neighbors(int y,int x,int bias,uint8_t *pointer){
+void neighbors(int8_t y,int8_t x,uint8_t bias,uint8_t *pointer){
     switch(bias){
         case RIGHT:
             pointer[0] = y;
@@ -171,7 +171,7 @@ void neighbors(int y,int x,int bias,uint8_t *pointer){
 
 //The primary function that allows the mouse to work
 //It takes a position and calculates the number of moves away from that position every cell in the maze is
-void maze_distances(int start_y,int start_x){
+void maze_distances(int8_t start_y,int8_t start_x){
     //initialize distances matrix to all MAXDISTANCE
     for(uint8_t i=0;i<MAXMAZESIZE;i++){
         for(uint8_t j=0;j<MAXMAZESIZE;j++){
@@ -201,21 +201,21 @@ void maze_distances(int start_y,int start_x){
 }
 
     //recursive function that is called for every cell
-    void recurse(int y,int x){
+    void recurse(int8_t y,int8_t x){
         //check if cell is in bounds
         if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
             return;
         }
     //Determines the distance the current cell is from the target position
-        int lowest_distance=distances[y][x];
+        uint8_t lowest_distance=distances[y][x];
         //get list of all neighboring cells
         uint8_t neighboring_cells_recurse[12];
         neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
         //initializes some variables
     //these aren't technically necessary, but they improve code readability
-        int cell_y;
-        int cell_x;
-        int cell_direction;
+        int8_t cell_y;
+        int8_t cell_x;
+        uint8_t cell_direction;
         //check neighbors for a lower distance
         for(uint8_t i=0;i<4;i++){
             //stores values into variables for the current cell
@@ -266,7 +266,7 @@ void maze_distances(int start_y,int start_x){
 
 //This function determines the best next move for the mouse to take
 //It takes a target position and returns the best move to make
-int next_move(int target_y,int target_x){
+uint8_t next_move(int8_t target_y,int8_t target_x){
     //are we already at the target coords
     if(current_y==target_y && current_x==target_x){
         return NOMOVE;
@@ -274,10 +274,10 @@ int next_move(int target_y,int target_x){
     //calculate distances
     maze_distances(target_y,target_x);
     //these aren't really necessary, but they improve code readability
-    int current_distance=distances[current_y][current_x];
-    int cell_y;
-    int cell_x;
-    int cell_direction;
+    uint8_t current_distance=distances[current_y][current_x];
+    int8_t cell_y;
+    int8_t cell_x;
+    uint8_t cell_direction;
     uint8_t neighbors_next_move[12];
     neighbors(current_y,current_x,current_direction,neighbors_next_move); //the bias here is very important, it priorotizes moves that require the least amount of rotation
     //check to find a reachable neighbor with a lower distance
@@ -316,8 +316,8 @@ int next_move(int target_y,int target_x){
 void measure(){
     // //Debug
     // //load the maze into memory
-    // for(int i=0;i<MAXMAZESIZE;i++){
-    //     for(int j=0;j<MAXMAZESIZE;j++){
+    // for(uint8_t i=0;i<MAXMAZESIZE;i++){
+    //     for(uint8_t j=0;j<MAXMAZESIZE;j++){
     //         memory[i][j]=maze[i][j];
     //     }
     // }
@@ -461,7 +461,7 @@ void make_move(uint8_t move,uint8_t number){
 }
 
 //The main high-level function that gets the mouse from point A to point B
-void navigate(int target_y,int target_x){
+void navigate(int8_t target_y,int8_t target_x){
     //Measures it's surroundings in the beginning
     //It turns and then measures again because the physical mouse will not have a rear sensor
     //It still needs to measure all four sides in the beginning, though
@@ -494,7 +494,7 @@ void navigate(int target_y,int target_x){
 //the code needs to be modified to not go through unexplored areas
 //recreation info in "unexploredSprintBug.txt"
 
-void sprint(int start_y,int start_x,int objective_y,int objective_x){
+void sprint(int8_t start_y,int8_t start_x,int8_t objective_y,int8_t objective_x){
     //gets the mouse back to the start
     printf("Returning to start\n");
     navigate(start_y,start_x);
@@ -532,7 +532,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     }
     //ADD FEATURE: Make the mouse turn to make the first move pre-emptively
     printf("Done!\n");
-    int path_length=move_counter;
+    uint8_t path_length=move_counter;
     //restore actual position and direction
     current_y=real_y;
     current_x=real_x;
