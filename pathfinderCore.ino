@@ -7,6 +7,9 @@
 //Use this library for neopixel control with an rpi pico
 //https://github.com/MrYsLab/NeoPixelConnect
 
+//FUTURE OPTIMIZATION
+//rework the algorithm to prioritize paths with fewer turns if it means traversal time is lower
+
 //Edit these defines to alter the behavior of the mouse
 #define START_Y 0
 #define START_X 0
@@ -466,7 +469,7 @@ void navigate(int target_y,int target_x){
     measure();
     turn_right();
     measure();
-    turn_left();
+    turn_left(); //THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
     int move=0;
     //while loop continuously to calculate the best next move, makes it, and then measure its surroundings
     while(move!=NOMOVE){
@@ -483,6 +486,14 @@ void navigate(int target_y,int target_x){
 //This function gets the mouse from the start to the goal as fast as possible
 //It does not stop to measure or recalculate anything
 //This is used to make the actual attempt at traversing the maze in record time
+
+//MAJOR BUG FIX REQUIRED
+//right now sprint() blindly assumes unexplored areas of the maze have no walls
+//this is because the flood-fill algorithm requires the aforementioned assumption to work
+//however, if it attempts to spring through unexplored areas, it will hit a wall
+//the code needs to be modified to not go through unexplored areas
+//recreation info in "unexploredSprintBug.txt"
+
 void sprint(int start_y,int start_x,int objective_y,int objective_x){
     //gets the mouse back to the start
     printf("Returning to start\n");
