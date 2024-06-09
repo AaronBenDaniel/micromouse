@@ -1,9 +1,11 @@
-//SUPER IMPORTANT NOTICE FOR WHEN THIS CODE ACTUALLY GETS IMPLEMENTED ON A MICROCONTROLLER!!!!!!!
 //THIS PROGRAM IS ULTRA-RECURSIVE (I KNOW THAT'S THE POINT)
 //IT USES A HUGE AMOUNT OF RAM
 ////WAY MORE THAN ANY ARDUINO BOARD HAS
 //USE AN RPI PICO
 //HONESTLY THEY'RE CHEAPER THAN METRO MINIS ANYWAYS
+
+//Use this library for neopixel control with an rpi pico
+//https://github.com/MrYsLab/NeoPixelConnect
 
 //Edit these defines to alter the behavior of the mouse
 #define START_Y 0
@@ -14,8 +16,6 @@
 
 //DO NOT EDIT ANY CODE BELOW THIS LINE
 
-#include <stdio.h>
-
 //Defines macros to use for better code readability
 //also for easily changing the parameters of the maze
 #define RIGHT 0
@@ -24,7 +24,7 @@
 #define DOWN 3
 #define NOMOVE -1
 #define MAXMAZESIZE 13
-#define MAXDISTANCE 1000
+#define MAXDISTANCE 255
 
 //This maze is only used for debugging purposes
 //The mouse will never access this maze during operation
@@ -44,14 +44,17 @@ int maze[MAXMAZESIZE][MAXMAZESIZE]={
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
 };
 
-//Global variables that need to be accessed by multiple fucntions
+//Global variables that need to be accessed by multiple functions
 //initialize distances matrix
 int distances[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize memory matrix
 int memory[MAXMAZESIZE][MAXMAZESIZE];
 
-//initialize position varaibles
+//initialize visited matrix
+int visited[MAXMAZESIZE][MAXMAZESIZE];
+
+//initialize position variables
 int current_y;
 int current_x;
 int current_direction;
@@ -101,7 +104,7 @@ void print_move(int move){
 //Function that returns a list[12] of the neighboring cells to an input cell
 //format: y_coord,x_coord,direction,[...],y_coord,x_coord,direction
 //can take a bias to change the order of the output 
-//make sure to initialize a variable to recieve results into first
+//make sure to initialize a variable to receive results into first
 void neighbors(int y,int x,int bias,int *pointer){
     switch(bias){
         case RIGHT:
@@ -166,15 +169,33 @@ void neighbors(int y,int x,int bias,int *pointer){
 //The primary function that allows the mouse to work
 //It takes a position and calculates the number of moves away from that position every cell in the maze is
 void maze_distances(int start_y,int start_x){
-    //initialize visited matrix
-    int visited[MAXMAZESIZE][MAXMAZESIZE];
-
+    //initialize distances matrix to all MAXDISTANCE
+    for(int i=0;i<MAXMAZESIZE;i++){
+        for(int j=0;j<MAXMAZESIZE;j++){
+            distances[i][j]=MAXDISTANCE;
+        }
+    }
+    //check if start cell is in bounds
+    if(!(start_y>=0 && start_y<MAXMAZESIZE-1 && start_x>=0 && start_x<MAXMAZESIZE-1)){
+        printf("INVALID START CELL\n");
+        return;
+    }
     //initialize visited matrix to all MAXDISTANCE
     for(int i=0;i<MAXMAZESIZE;i++){
         for(int j=0;j<MAXMAZESIZE;j++){
             visited[i][j]=MAXDISTANCE;
         }
     }
+    //set start cell in distances matrix to 0
+    distances[start_y][start_x]=0;
+    //get a list of neighboring cells to the start cell
+    int neighboring_cells[12];
+    neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
+    //run the recursive function on all of the neighboring cells
+    for(int i=0;i<4;i++){
+        recurse(neighboring_cells[0+3*i],neighboring_cells[1+3*i]);
+    }
+}
 
     //recursive function that is called for every cell
     void recurse(int y,int x){
@@ -182,18 +203,19 @@ void maze_distances(int start_y,int start_x){
         if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
             return;
         }
-        //Determines the distance the current cell is from the given position
+    //Determines the distance the current cell is from the target position
         int lowest_distance=distances[y][x];
         //get list of all neighboring cells
         int neighboring_cells_recurse[12];
         neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
         //initializes some variables
-        //these aren't really necessary, but they improve code readability
+    //these aren't technically necessary, but they improve code readability
         int cell_y;
         int cell_x;
         int cell_direction;
         //check neighbors for a lower distance
         for(int i=0;i<4;i++){
+            //stores values into variables for the current cell
             cell_y=neighboring_cells_recurse[0+3*i];
             cell_x=neighboring_cells_recurse[1+3*i];
             cell_direction=neighboring_cells_recurse[2+3*i];
@@ -202,7 +224,7 @@ void maze_distances(int start_y,int start_x){
                 continue;
             }
             //is there a reachable neighbor with a lower distance?
-            if(lowest_distance>distances[cell_y][cell_x]){// POTENTIAL OPTIMIZATON: add "-1" to lowest_distance
+            if(lowest_distance>distances[cell_y][cell_x]){// POTENTIAL OPTIMIZATION: add "-1" to lowest_distance
                 //determine if there is a wall inbetween the current cell and the neighbor
                 if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
                     lowest_distance=distances[cell_y][cell_x];
@@ -238,32 +260,6 @@ void maze_distances(int start_y,int start_x){
             }
         }
     }
-    //check if start cell is in bounds
-    if(!(start_y>=0 && start_y<MAXMAZESIZE-1 && start_x>=0 && start_x<MAXMAZESIZE-1)){
-        printf("INVALID START CELL\n");
-    }
-    //initialize distances matrix to all MAXDISTANCE
-    for(int i=0;i<MAXMAZESIZE;i++){
-        for(int j=0;j<MAXMAZESIZE;j++){
-            distances[i][j]=MAXDISTANCE;
-        }
-    }
-    //initialize visted matrix to all MAXDISTANCE
-    for(int i=0;i<MAXMAZESIZE;i++){
-        for(int j=0;j<MAXMAZESIZE;j++){
-            visited[i][j]=MAXDISTANCE;
-        }
-    }
-    //set start cell in distances matrix to 0
-    distances[start_y][start_x]=0;
-    //get a list of neighboring cells to the start cell
-    int neighboring_cells[12];
-    neighbors(start_y,start_x,RIGHT,neighboring_cells); //bias here is completely arbitrary
-    //run the recursive function on all of the neighboring cells
-    for(int i=0;i<4;i++){
-        recurse(neighboring_cells[0+3*i],neighboring_cells[1+3*i]);
-    }
-}
 
 //This function determines the best next move for the mouse to take
 //It takes a target position and returns the best move to make
@@ -274,13 +270,13 @@ int next_move(int target_y,int target_x){
     }
     //calculate distances
     maze_distances(target_y,target_x);
-    int current_distance=distances[current_y][current_x];
-    int neighbors_next_move[12];
     //these aren't really necessary, but they improve code readability
+    int current_distance=distances[current_y][current_x];
     int cell_y;
     int cell_x;
     int cell_direction;
-    neighbors(current_y,current_x,current_direction,neighbors_next_move);
+    int neighbors_next_move[12];
+    neighbors(current_y,current_x,current_direction,neighbors_next_move); //the bias here is very important, it priorotizes moves that require the least amount of rotation
     //check to find a reachable neighbor with a lower distance
     for(int i=0;i<4;i++){
         cell_y=neighbors_next_move[0+3*i];
@@ -308,15 +304,15 @@ int next_move(int target_y,int target_x){
     }
     //This ideally should never be executed
     //The mouse should never be put in an unsolvable maze
-    //(what would the point even be?)
+    //What would the point even be?
     printf("UNSOLVABLE MAZE\n");
     return NOMOVE;
 }
 
 //NEEDS HARDWARE INTERFACE
 void measure(){
-    //Debug
-    //load the maze into memory
+    // //Debug
+    // //load the maze into memory
     // for(int i=0;i<MAXMAZESIZE;i++){
     //     for(int j=0;j<MAXMAZESIZE;j++){
     //         memory[i][j]=maze[i][j];
@@ -325,6 +321,7 @@ void measure(){
 
     //Temporary development code
     //Check what's visible to the mouse and store it into memory
+    //Is there a wall above or to the left of the mouse
     memory[current_y][current_x]=maze[current_y][current_x];
     //Is there a wall below the mouse
     if(maze[current_y+1][current_x]==1 || maze[current_y+1][current_x]==3){
@@ -351,7 +348,7 @@ void measure(){
         }
     }
     //Real code goes here (eventually)
-    //This will query the reflectance sensors to see if there are any walls at the mouse's current position
+    //This will query the sensors to see if there are any walls at the mouse's current position
 }
 
 //NEEDS HARDWARE INTERFACE
@@ -399,7 +396,7 @@ void turn_left(){
     //This will actually command the motors to turn on in a certain direction for a certain amount of time
 }
 
-//This function takes a move, positions the mouse to make it, and then makes the move
+//This function takes a move as input, positions the mouse to make it, and then makes the move
 void make_move(int move,int number){
     //don't do anything if the move in NOMOVE
     if(move==NOMOVE){
@@ -463,7 +460,13 @@ void make_move(int move,int number){
 //The main high-level function that gets the mouse from point A to point B
 void navigate(int target_y,int target_x){
     //Measures it's surroundings in the beginning
+    //It turns and then measures again because the physical mouse will not have a rear sensor
+    //It still needs to measure all four sides in the beginning, though
+    //After the start, it will never need to measure behind it
     measure();
+    turn_right();
+    measure();
+    turn_left();
     int move=0;
     //while loop continuously to calculate the best next move, makes it, and then measure its surroundings
     while(move!=NOMOVE){
@@ -478,6 +481,7 @@ void navigate(int target_y,int target_x){
 }
 
 //This function gets the mouse from the start to the goal as fast as possible
+//It does not stop to measure or recalculate anything
 //This is used to make the actual attempt at traversing the maze in record time
 void sprint(int start_y,int start_x,int objective_y,int objective_x){
     //gets the mouse back to the start
@@ -496,21 +500,18 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
         //calculate the best next move
         move=next_move(objective_y,objective_x);
         //virtually execute the move
+        current_direction=move;
         switch(move){
             case RIGHT:
-                current_direction=0;
                 current_x++;
             break;
             case UP:
-                current_direction=1;
                 current_y--;
             break;
             case LEFT:
-                current_direction=2;
                 current_x--;
             break;
             case DOWN:
-                current_direction=3;
                 current_y++;
             break;
         }
@@ -559,7 +560,7 @@ void sprint(int start_y,int start_x,int objective_y,int objective_x){
     printf("Done!\n");
 }  
 
-int main(){
+void setup(){
 //initialize distances matrix to all MAXDISTANCE
 for(int i=0;i<MAXMAZESIZE;i++){
     for(int j=0;j<MAXMAZESIZE;j++){
@@ -583,4 +584,8 @@ current_direction=START_DIRECTION;
 //currently it will behave like a Micromouse would in the competition
 navigate(GOAL_Y,GOAL_X);
 sprint(START_Y,START_X,GOAL_Y,GOAL_X);
+}
+
+void loop(){
+    delay(1);
 }
