@@ -54,8 +54,8 @@ uint8_t distances[MAXMAZESIZE][MAXMAZESIZE];
 //initialize memory matrix
 uint8_t memory[MAXMAZESIZE][MAXMAZESIZE];
 
-//initialize visited matrix
-uint8_t visited[MAXMAZESIZE][MAXMAZESIZE];
+//initialize visitedRecurse matrix
+uint8_t visitedRecurse[MAXMAZESIZE][MAXMAZESIZE];
 
 //initialize position variables
 int8_t current_y;
@@ -75,8 +75,7 @@ void print_matrix(uint8_t matrix[MAXMAZESIZE][MAXMAZESIZE]){
                 printf(". ");
             }
         }
-        printf("},");
-        printf("\n");
+        printf("},\n");
     }
 }
 
@@ -183,10 +182,10 @@ void maze_distances(int8_t start_y,int8_t start_x){
         printf("INVALID START CELL\n");
         return;
     }
-    //initialize visited matrix to all MAXDISTANCE
+    //initialize visitedRecurse matrix to all MAXDISTANCE
     for(uint8_t i=0;i<MAXMAZESIZE;i++){
         for(uint8_t j=0;j<MAXMAZESIZE;j++){
-            visited[i][j]=MAXDISTANCE;
+            visitedRecurse[i][j]=MAXDISTANCE;
         }
     }
     //set start cell in distances matrix to 0
@@ -200,69 +199,69 @@ void maze_distances(int8_t start_y,int8_t start_x){
     }
 }
 
-    //recursive function that is called for every cell
-    void recurse(int8_t y,int8_t x){
+//recursive function that is called for every cell
+void recurse(int8_t y,int8_t x){
+    //check if cell is in bounds
+    if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
+        return;
+    }
+//Determines the distance the current cell is from the target position
+    uint8_t lowest_distance=distances[y][x];
+    //get list of all neighboring cells
+    uint8_t neighboring_cells_recurse[12];
+    neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
+    //initializes some variables
+//these aren't technically necessary, but they improve code readability
+    int8_t cell_y;
+    int8_t cell_x;
+    uint8_t cell_direction;
+    //check neighbors for a lower distance
+    for(uint8_t i=0;i<4;i++){
+        //stores values into variables for the current cell
+        cell_y=neighboring_cells_recurse[0+3*i];
+        cell_x=neighboring_cells_recurse[1+3*i];
+        cell_direction=neighboring_cells_recurse[2+3*i];
         //check if cell is in bounds
-        if(!(y>=0 && y<MAXMAZESIZE-1 && x>=0 && x<MAXMAZESIZE-1)){
-            return;
+        if(!(cell_y>=0 && cell_y<MAXMAZESIZE-1 && cell_x>=0 && cell_x<MAXMAZESIZE-1)){
+            continue;
         }
-    //Determines the distance the current cell is from the target position
-        uint8_t lowest_distance=distances[y][x];
-        //get list of all neighboring cells
-        uint8_t neighboring_cells_recurse[12];
-        neighbors(y,x,RIGHT,neighboring_cells_recurse); //bias here is completely arbitrary
-        //initializes some variables
-    //these aren't technically necessary, but they improve code readability
-        int8_t cell_y;
-        int8_t cell_x;
-        uint8_t cell_direction;
-        //check neighbors for a lower distance
-        for(uint8_t i=0;i<4;i++){
-            //stores values into variables for the current cell
-            cell_y=neighboring_cells_recurse[0+3*i];
-            cell_x=neighboring_cells_recurse[1+3*i];
-            cell_direction=neighboring_cells_recurse[2+3*i];
-            //check if cell is in bounds
-            if(!(cell_y>=0 && cell_y<MAXMAZESIZE-1 && cell_x>=0 && cell_x<MAXMAZESIZE-1)){
-                continue;
+        //is there a reachable neighbor with a lower distance?
+        if(lowest_distance>distances[cell_y][cell_x]){// POTENTIAL OPTIMIZATION: add "-1" to lowest_distance
+            //determine if there is a wall inbetween the current cell and the neighbor
+            if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
+                lowest_distance=distances[cell_y][cell_x];
+                distances[y][x]=lowest_distance+1;
             }
-            //is there a reachable neighbor with a lower distance?
-            if(lowest_distance>distances[cell_y][cell_x]){// POTENTIAL OPTIMIZATION: add "-1" to lowest_distance
-                //determine if there is a wall inbetween the current cell and the neighbor
-                if(cell_direction==RIGHT && memory[cell_y][cell_x]!=2 && memory[cell_y][cell_x]!=3){
-                    lowest_distance=distances[cell_y][cell_x];
-                    distances[y][x]=lowest_distance+1;
-                }
-                if(cell_direction==UP && memory[y][x]!=1 && memory[y][x]!=3){
-                    lowest_distance=distances[cell_y][cell_x];
-                    distances[y][x]=lowest_distance+1;
-                }
-                if(cell_direction==LEFT && memory[y][x]!=2 && memory[y][x]!=3){
-                    lowest_distance=distances[cell_y][cell_x];
-                    distances[y][x]=lowest_distance+1;
-                }
-                if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
-                    lowest_distance=distances[cell_y][cell_x];
-                    distances[y][x]=lowest_distance+1;
-                }
+            if(cell_direction==UP && memory[y][x]!=1 && memory[y][x]!=3){
+                lowest_distance=distances[cell_y][cell_x];
+                distances[y][x]=lowest_distance+1;
             }
-        }
-        //Major optimization - it checks if the new distances is lower than what it previously had
-        //if it wasn't, then we know that the program had already moved through this area and it already calculated all of the distances
-        if(!(distances[y][x]<visited[y][x])){
-            return;
-        }
-        //Everything below this line will execute if a lower distance was calculated
-        visited[y][x]=distances[y][x];
-        //Runs the recurse() function on all neighboring cells
-        for(uint8_t i=0;i<4;i++){
-            cell_y=neighboring_cells_recurse[0+3*i];
-            cell_x=neighboring_cells_recurse[1+3*i];
-            if(!(distances[cell_y][cell_x]<=lowest_distance)){
-                recurse(cell_y,cell_x);
+            if(cell_direction==LEFT && memory[y][x]!=2 && memory[y][x]!=3){
+                lowest_distance=distances[cell_y][cell_x];
+                distances[y][x]=lowest_distance+1;
+            }
+            if(cell_direction==DOWN && memory[cell_y][cell_x]!=1 && memory[cell_y][cell_x]!=3){
+                lowest_distance=distances[cell_y][cell_x];
+                distances[y][x]=lowest_distance+1;
             }
         }
     }
+    //Major optimization - it checks if the new distances is lower than what it previously had
+    //if it wasn't, then we know that the program had already moved through this area and it already calculated all of the distances
+    if(!(distances[y][x]<visitedRecurse[y][x])){
+        return;
+    }
+    //Everything below this line will execute if a lower distance was calculated
+    visitedRecurse[y][x]=distances[y][x];
+    //Runs the recurse() function on all neighboring cells
+    for(uint8_t i=0;i<4;i++){
+        cell_y=neighboring_cells_recurse[0+3*i];
+        cell_x=neighboring_cells_recurse[1+3*i];
+        if(!(distances[cell_y][cell_x]<=lowest_distance)){
+            recurse(cell_y,cell_x);
+        }
+    }
+}
 
 //This function determines the best next move for the mouse to take
 //It takes a target position and returns the best move to make
@@ -556,8 +555,7 @@ void sprint(int8_t start_y,int8_t start_x,int8_t objective_y,int8_t objective_x)
         if(move_counter==1){
             //print move normally if it only happened once
             print_move(moves[i-1]);
-            printf(" [%d,%d]",current_y,current_x);
-            printf("\n");
+            printf(" [%d,%d]\n",current_y,current_x);
         }
         else{
             //if multiple moves were made, print how many times
