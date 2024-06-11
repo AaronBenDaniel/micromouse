@@ -566,7 +566,7 @@ void sprint(int8_t start_y, int8_t start_x, int8_t objective_y, int8_t objective
 
 void setup() {
   Serial.begin(9600);
-  delay(5000); //FOR DEELOPMENT PURPOSES ONLY REMOVE THIS EVENTUALLY
+  delay(5000); //FOR DEVELOPMENT PURPOSES ONLY REMOVE THIS EVENTUALLY
     //initialize distances matrix to all MAXDISTANCE
     for (uint8_t i = 0; i < MAXMAZESIZE; i++) {
     for (uint8_t j = 0; j < MAXMAZESIZE; j++) {
