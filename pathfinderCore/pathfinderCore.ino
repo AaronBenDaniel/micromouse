@@ -1,9 +1,11 @@
+#include <cppQueue.h>
+
 //Edit these defines to alter the behavior of the mouse
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 10
-#define GOAL_X 10
+#define GOAL_Y 1
+#define GOAL_X 1
 
 //DO NOT EDIT ANY CODE BELOW THIS LINE
 
@@ -92,10 +94,11 @@ void printMatrix(struct matrix_t matrix) {
     Serial.print("{");
     for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
       if (matrix.matrix[y][x] != MAXDISTANCE) {
+        if (matrix.matrix[y][x] < 10) Serial.print("0");
         Serial.print(matrix.matrix[y][x]);
         Serial.print(", ");
       } else {
-        Serial.print(". ");
+        Serial.print("99, ");
       }
     }
     Serial.println("},");
@@ -321,19 +324,32 @@ struct matrix_t calcDistances(struct xyPair_t rootCell) {
   //set root cell in distances matrix to 0
   distances.matrix[rootCell.y][rootCell.x] = 0;
 
-  struct xyPair_t test;
-  test.x = rootCell.x;
-  test.y = rootCell.y + 1;
-  distances = updateCellDistance(distances, test);
-  test.x = rootCell.x - 1;
-  test.y = rootCell.y + 1;
-  distances = updateCellDistance(distances, test);
-  test.x = rootCell.x - 1;
-  test.y = rootCell.y;
-  distances = updateCellDistance(distances, test);
-  test.x = rootCell.x - 1;
-  test.y = rootCell.y - 1;
-  distances = updateCellDistance(distances, test);
+  //initialize queue
+  cppQueue queue(sizeof(xyPair_t), 256, FIFO, false);
+
+  //push neighbors of root cell to queue
+  struct neighbors_t cellNeighbors;
+  cellNeighbors = neighbors(rootCell);
+  for (uint8_t i = 0; i < 4; i++) {
+    queue.push(&cellNeighbors.direction[i]);
+  }
+
+  while (!queue.isEmpty()) {
+    struct xyPair_t cell;
+    queue.pop(&cell);
+
+    uint8_t beforeDistance = distances.matrix[cell.y][cell.x];
+    distances = updateCellDistance(distances, cell);
+
+    if (distances.matrix[cell.y][cell.x] >= beforeDistance) {
+      continue;
+    }
+
+    cellNeighbors = neighbors(cell);
+    for (uint8_t i = 0; i < 4; i++) {
+      queue.push(&cellNeighbors.direction[i]);
+    }
+  }
   return (distances);
 }
 
@@ -380,7 +396,7 @@ struct matrix_t updateCellDistance(struct matrix_t distances, struct xyPair_t ce
         lowestDistance = distances.matrix[currentCell.y][currentCell.x];
       }
 
-      if (cellDirection == DOWN && memory.matrix[cell.y][currentCell.x] != 1 && memory.matrix[currentCell.y][currentCell.x] != 3) {
+      if (cellDirection == DOWN && memory.matrix[currentCell.y][currentCell.x] != 1 && memory.matrix[currentCell.y][currentCell.x] != 3) {
         lowestDistance = distances.matrix[currentCell.y][currentCell.x];
       }
     }
@@ -416,7 +432,7 @@ uint8_t nextMove(struct xyPair_t targetCell) {
     cellDirection = bias[mouse.direction][i];
 
     //check if cell is in bounds
-    if (cell.y < 0 || cell.y > MAXMAZESIZE - 1 || cell.x < 0 && cell.x > MAXMAZESIZE - 1) {
+    if (cell.y < 0 || cell.y > MAXMAZESIZE - 1 || cell.x < 0 || cell.x > MAXMAZESIZE - 1) {
       continue;
     }
 
@@ -477,19 +493,20 @@ void setup() {
 
 void loop() {
   // ALL OF THIS IS FOR TESTING ONLY
-  struct matrix_t distances;
-  struct xyPair_t pair;
-  pair.x = 1;
-  pair.y = 1;
-  distances = calcDistances(pair);
-  printMatrix(distances);
-  uint8_t move = 0;
-  while (move != NOMOVE) {
-    move = nextMove(pair);
-    printMove(move);
-    Serial.println("");
-    makeMove(move, 1);
-  }
+  struct matrix_t distancesA;
+  distancesA = calcDistances(goalPos);
+  printMatrix(distancesA);
+  Serial.println("");
+
+  nextMove(goalPos);
+
+  // uint8_t move = 0;
+  // while (move != NOMOVE) {
+  //   move = nextMove(goalPos);
+  //   printMove(move);
+  //   Serial.println("");
+  //   makeMove(move, 1);
+  // }
   while (1) {
     delay(1);
   }
