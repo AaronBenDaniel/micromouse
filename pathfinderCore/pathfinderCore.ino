@@ -1,11 +1,11 @@
 #include <cppQueue.h>
 
 //Edit these defines to alter the behavior of the mouse
-#define START_Y 0
+#define START_Y 11
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 1
-#define GOAL_X 1
+#define GOAL_Y 9
+#define GOAL_X 10
 
 //DO NOT EDIT ANY CODE BELOW THIS LINE
 
@@ -50,7 +50,7 @@ struct matrix_t {
 //This maze is only used for development purposes
 //The mouse will never access this maze during operation
 struct matrix_t maze;
-void initVirtualMaze() {  //Call this function before anything else to load the hardcoded debug maze into the maze struct
+void initVirtualMaze() {  //Call this function before anything else to load the hardcoded Serial maze into the maze struct
   uint8_t mazeArray[MAXMAZESIZE][MAXMAZESIZE] = {
     { 3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2 },
     { 2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2 },
@@ -78,10 +78,6 @@ void initVirtualMaze() {  //Call this function before anything else to load the 
 struct matrix_t memory;
 
 struct mouse_t mouse;
-
-struct xyPair_t startPos;
-
-struct xyPair_t goalPos;
 
 //
 // GENERAL FUCNTIONS FOR READABILITY AND CODE DEDUPLICATION
@@ -316,9 +312,9 @@ struct matrix_t calcDistances(struct xyPair_t rootCell) {
   }
 
   //check if root cell is in bounds
-  if (rootCell.y < 0 || rootCell.y > MAXMAZESIZE - 1 || rootCell.x < 0 || rootCell.x > MAXMAZESIZE - 1) {
+  if (rootCell.y < 0 || rootCell.y > MAXMAZESIZE - 2 || rootCell.x < 0 || rootCell.x > MAXMAZESIZE - 2) {
     Serial.println("INVALID ROOT CELL");
-    return;
+    return (distances);
   }
 
   //set root cell in distances matrix to 0
@@ -350,13 +346,15 @@ struct matrix_t calcDistances(struct xyPair_t rootCell) {
       queue.push(&cellNeighbors.direction[i]);
     }
   }
+
+  queue.flush();
   return (distances);
 }
 
 struct matrix_t updateCellDistance(struct matrix_t distances, struct xyPair_t cell) {
   //check if cell is in bounds
-  if (cell.y < 0 || cell.y > MAXMAZESIZE - 1 || cell.x < 0 || cell.x > MAXMAZESIZE - 1) {
-    return;
+  if (cell.y < 0 || cell.y > MAXMAZESIZE - 2 || cell.x < 0 || cell.x > MAXMAZESIZE - 2) {
+    return (distances);
   }
 
   //determine the distance the current cell is from the root cell
@@ -432,7 +430,7 @@ uint8_t nextMove(struct xyPair_t targetCell) {
     cellDirection = bias[mouse.direction][i];
 
     //check if cell is in bounds
-    if (cell.y < 0 || cell.y > MAXMAZESIZE - 1 || cell.x < 0 || cell.x > MAXMAZESIZE - 1) {
+    if (cell.y < 0 || cell.y > MAXMAZESIZE - 2 || cell.x < 0 || cell.x > MAXMAZESIZE - 2) {
       continue;
     }
 
@@ -463,6 +461,112 @@ uint8_t nextMove(struct xyPair_t targetCell) {
   return NOMOVE;
 }
 
+void navigate(struct xyPair_t destination) {
+  //Measures it's surroundings in the beginning
+  //It turns and then measures again because the physical mouse will not have a rear sensor
+  //It still needs to measure all four sides in the beginning, though
+  //After the start, it will never need to measure behind it
+  measure();
+  turn_right();
+  measure();
+  turn_left();  //THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
+  uint8_t move = 0;
+  //while loop continuously to calculate the best next move, makes it, and then measure its surroundings
+  while (move != NOMOVE) {
+    move = nextMove(destination);
+    makeMove(move, 1);
+    Serial.print("\nMade move: \"");
+    printMove(move);
+    Serial.print("\"\nCurrent coordinates are [");
+    Serial.print(mouse.pos.y);
+    Serial.print(",");
+    Serial.print(mouse.pos.x);
+    Serial.println("]");
+    measure();
+  }
+  Serial.println("Done!");
+}
+
+void sprint(struct xyPair_t goal) {
+  //store current position and direction
+  struct xyPair_t realPos;
+  realPos = mouse.pos;
+  uint8_t realDirection = mouse.direction;
+  //initialize the list of moves
+  uint8_t moves[MAXDISTANCE];
+  uint8_t move = 0;
+  uint8_t moveCounter = 0;
+  Serial.println("\nCalculating shortest path");
+  while (move != NOMOVE) {
+    //calculate the best next move
+    move = nextMove(goal);
+    //virtually execute the move
+    mouse.direction = move;
+    switch (move) {
+      case RIGHT:
+        mouse.pos.x++;
+        break;
+      case UP:
+        mouse.pos.y--;
+        break;
+      case LEFT:
+        mouse.pos.x--;
+        break;
+      case DOWN:
+        mouse.pos.y++;
+        break;
+    }
+    //store the move
+    moves[moveCounter] = move;
+    moveCounter++;
+  }
+  //ADD FEATURE: Make the mouse turn to make the first move pre-emptively
+  Serial.println("Done!");
+  uint8_t path_length = moveCounter;
+  //restore actual position and direction
+  mouse.pos = realPos;
+  mouse.direction = realDirection;
+  moveCounter = 1;
+  //execute the stored moves as fast as possible
+  Serial.println("\nSprint!");
+  //IMPORTANT NOTE: for loop starts on the SECOND item in the list
+  for (uint8_t i = 1; i <= path_length; i++) {
+    //checks if the current move equals the previous move
+    if (moves[i] == moves[i - 1]) {
+      //increment the move counter
+      moveCounter++;
+      //goes to next move
+      continue;
+    } else {
+      //makes the move with the number of stored same-direction moves
+      makeMove(moves[i - 1], moveCounter);
+    }
+    if (moveCounter == 1) {
+      //print move normally if it only happened once
+      printMove(moves[i - 1]);
+      Serial.print(" [");
+      Serial.print(mouse.pos.y);
+      Serial.print(",");
+      Serial.print(mouse.pos.x);
+      Serial.println("]");
+    } else {
+      //if multiple moves were made, print how many times
+      printMove(moves[i - 1]);
+      Serial.print(" ");
+      Serial.print(moveCounter);
+      Serial.print(" times");
+      Serial.print(" [");
+      Serial.print(mouse.pos.y);
+      Serial.print(",");
+      Serial.print(mouse.pos.x);
+      Serial.println("]");
+    }
+    //reset move counter
+    moveCounter = 1;
+  }
+  Serial.println("Done!");
+}
+
 void setup() {
   Serial.begin(19200);
   initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
@@ -474,39 +578,32 @@ void setup() {
     }
   }
 
-  // FOR TESTING PURPOSES ONLY
-  for (uint8_t y = 0; y < MAXMAZESIZE; y++) {
-    for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
-      memory.matrix[y][x] = maze.matrix[y][x];
-    }
-  }
+  // // FOR TESTING PURPOSES ONLY
+  // for (uint8_t y = 0; y < MAXMAZESIZE; y++) {
+  //   for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
+  //     memory.matrix[y][x] = maze.matrix[y][x];
+  //   }
+  // }
 
   // load start and goal coordinates
-  startPos.y = START_Y;
-  startPos.x = START_X;
-  goalPos.y = GOAL_Y;
-  goalPos.x = GOAL_X;
   mouse.direction = START_DIRECTION;
-  mouse.pos.y = startPos.y;
-  mouse.pos.x = startPos.x;
+  mouse.pos.y = START_Y;
+  mouse.pos.x = START_X;
+  delay(3000);  //FOR DEVELOPMENT PURPOSES ONLY REMOVE EVENTUALLY
 }
 
 void loop() {
   // ALL OF THIS IS FOR TESTING ONLY
-  struct matrix_t distancesA;
-  distancesA = calcDistances(goalPos);
-  printMatrix(distancesA);
-  Serial.println("");
+  struct xyPair_t goalPos;
+  goalPos.y = GOAL_Y;
+  goalPos.x = GOAL_X;
 
-  nextMove(goalPos);
+  struct xyPair_t startPos;
+  startPos.y = START_Y;
+  startPos.x = START_X;
 
-  // uint8_t move = 0;
-  // while (move != NOMOVE) {
-  //   move = nextMove(goalPos);
-  //   printMove(move);
-  //   Serial.println("");
-  //   makeMove(move, 1);
-  // }
+  navigate(goalPos);
+
   while (1) {
     delay(1);
   }
