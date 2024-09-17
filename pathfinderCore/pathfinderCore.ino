@@ -80,7 +80,7 @@ struct matrix_t memory;
 struct mouse_t mouse;
 
 //
-// GENERAL FUCNTIONS FOR READABILITY AND CODE DEDUPLICATION
+// GENERAL FUNCTIONS FOR READABILITY AND CODE DEDUPLICATION
 //
 
 //Development function for printing a matrix in a human-readable manner
@@ -126,7 +126,7 @@ void printMove(uint8_t move) {
 }
 
 //This function returns a struct of type neighbors_t that contains four
-//structs of type xyPair_t that contain coordiante pairs of the neighboring cells
+//structs of type xyPair_t that contain coordinate pairs of the neighboring cells
 //to the input cell.
 struct neighbors_t neighbors(struct xyPair_t cell) {
   struct neighbors_t neighbors;
