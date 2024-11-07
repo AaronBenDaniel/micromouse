@@ -154,6 +154,7 @@ uint8_t nextMove(struct xyPair_t targetCell) {
   //This ideally should never be executed
   //The mouse should never be put in an unsolvable maze
   //What would the point even be?
+  setColor(RED);
   Serial.println("UNSOLVABLE MAZE");
   return NOMOVE;
 }
@@ -163,6 +164,7 @@ void navigate(struct xyPair_t destination) {
   //It turns and then measures again because the physical mouse will not have a rear sensor
   //It still needs to measure all four sides in the beginning, though
   //After the start, it will never need to measure behind it
+  setColor(YELLOW);
   measure();
   turn_right();
   measure();
@@ -185,6 +187,7 @@ void navigate(struct xyPair_t destination) {
 }
 
 void sprint(struct xyPair_t goal) {
+  setColor(YELLOW);
   //store current position and direction
   struct xyPair_t realPos;
   realPos = mouse.pos;

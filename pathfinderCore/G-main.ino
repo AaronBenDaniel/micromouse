@@ -1,4 +1,7 @@
 void mainSetup() {
+  pixelInit();
+  pinMode(0, INPUT_PULLUP);
+
   Serial.begin(19200);
   initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
 
@@ -33,7 +36,19 @@ void mainLoop() {
   startPos.y = START_Y;
   startPos.x = START_X;
 
+  buttonCheckpoint();
+
   navigate(goalPos);
+
+  buttonCheckpoint();
+
+  navigate(startPos);
+
+  buttonCheckpoint();
+
+  sprint(goalPos);
+
+  setColor(GREEN);
 
   while (1) {
     delay(1);

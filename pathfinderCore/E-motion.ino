@@ -18,6 +18,7 @@ void forward(uint8_t number) {
         break;
     }
   }
+  delay(200); //TESTING ONLY PLEASE REMOVE THIS LINE
   //This will actually command the motors to turn on for a certain amount of time
 }
 

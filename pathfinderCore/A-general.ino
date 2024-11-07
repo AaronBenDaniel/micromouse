@@ -1,4 +1,7 @@
 #include <cppQueue.h>
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
 //Edit these defines to alter the behavior of the mouse
 #define START_Y 11
@@ -18,6 +21,9 @@
 #define NOMOVE 4
 #define MAXMAZESIZE 13
 #define MAXDISTANCE 255
+
+// Neopixel color consts
+const uint8_t GREEN = 0, BLUE = 1, YELLOW = 2, RED = 3, OFF = 4;
 
 // .......look this is either genius or stupid
 uint8_t bias[4][4] = {
@@ -134,6 +140,53 @@ struct neighbors_t neighbors(struct xyPair_t cell) {
   neighbors.direction[LEFT].x = cell.x - 1;
 
   return (neighbors);
+}
+
+//Neopixel functions
+void setColor(uint8_t color) {
+  switch (color) {
+    case RED:
+      pixel.setPixelColor(0, 255, 0, 0);
+      break;
+    case GREEN:
+      pixel.setPixelColor(0, 0, 255, 0);
+      break;
+    case BLUE:
+      pixel.setPixelColor(0, 0, 0, 255);
+      break;
+    case YELLOW:
+      pixel.setPixelColor(0, 255, 255, 0);
+      break;
+    case OFF:
+      pixel.setPixelColor(0, 0, 0, 0);
+      break;
+  }
+  pixel.show();
+}
+
+void pixelInit() {
+  pixel.begin();
+  pixel.setPixelColor(0, 0, 0, 0);
+  pixel.show();
+}
+
+void buttonCheckpoint() {
+  int time = millis();
+  bool toggle = false;
+  while (digitalRead(0) == HIGH) {
+    if (millis() - time > 500) {
+      if (toggle) {
+        setColor(BLUE);
+        toggle = false;
+      } else {
+        setColor(OFF);
+        toggle = true;
+      }
+      time = millis();
+    }
+  }
+  setColor(BLUE);
+  delay(3000);
 }
 
 //Global structs that need to be accessed by multiple functions
