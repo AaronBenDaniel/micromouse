@@ -1,0 +1,5 @@
+https://arduino.stackexchange.com/questions/60656/split-up-arduino-code-into-multiple-files-using-arduino-ide
+
+"Before compilation starts, the Arduino IDE concatenates all .ino files in your sketch into a single file, starting with the .ino file that matches the sketch folder name, followed by the rest of the .ino files in alphabetical order. So there is no difference between one massive .ino file and breaking the same code among multiple .ino files, other than the greater ease of navigating the code via tabs. After a bit more processing, this file is compiled as C++."
+
+Files MUST be kept with the uppercase letter in the beginning to maintain the correct order.
