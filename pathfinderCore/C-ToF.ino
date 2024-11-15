@@ -1,6 +1,5 @@
 //NEEDS HARDWARE INTERFACE
 void measure() {
-  //Temporary development code
   //Check what's visible to the mouse and store it into memory
   //Is there a wall above or to the left of the mouse
   memory.matrix[mouse.pos.y][mouse.pos.x] = maze.matrix[mouse.pos.y][mouse.pos.x];

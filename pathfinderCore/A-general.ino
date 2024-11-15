@@ -1,16 +1,8 @@
-#include <cppQueue.h>
-#include <Adafruit_NeoPixel.h>
+#include <cppQueue.h> // Navigation
+#include <Adafruit_NeoPixel.h> // Status Indicator
+#include <ESP32Encoder.h>  // https://github.com/madhephaestus/ESP32Encoder.git
 
 Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
-
-//Edit these defines to alter the behavior of the mouse
-#define START_Y 11
-#define START_X 0
-#define START_DIRECTION RIGHT
-#define GOAL_Y 9
-#define GOAL_X 10
-
-//DO NOT EDIT ANY CODE BELOW THIS LINE
 
 //Defines macros to use for better code readability
 //also for easily changing the parameters of the maze

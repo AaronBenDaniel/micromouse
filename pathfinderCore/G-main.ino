@@ -1,5 +1,14 @@
+//Edit these defines to alter the behavior of the mouse
+#define START_Y 11
+#define START_X 0
+#define START_DIRECTION RIGHT
+#define GOAL_Y 9
+#define GOAL_X 10
+
 void mainSetup() {
   pixelInit();
+  setColor(YELLOW);
+  IMUInit();
   pinMode(0, INPUT_PULLUP);
 
   Serial.begin(19200);
@@ -23,34 +32,78 @@ void mainSetup() {
   mouse.direction = START_DIRECTION;
   mouse.pos.y = START_Y;
   mouse.pos.x = START_X;
+  setColor(BLUE);
   delay(3000);  //FOR DEVELOPMENT PURPOSES ONLY REMOVE EVENTUALLY
+  setColor(GREEN);
 }
 
+long lastEncoder = 0;
+long lastUpdate = 0;
+float target = 0;
+
 void mainLoop() {
-  // ALL OF THIS IS FOR TESTING ONLY
-  struct xyPair_t goalPos;
-  goalPos.y = GOAL_Y;
-  goalPos.x = GOAL_X;
+  motorR.PWMRun();
+  motorL.PWMRun();
 
-  struct xyPair_t startPos;
-  startPos.y = START_Y;
-  startPos.x = START_X;
+  const float proportionalGain = 6;
 
-  buttonCheckpoint();
+  float angle = getAngle();
+  int16_t speedHelper;
 
-  navigate(goalPos);
-
-  buttonCheckpoint();
-
-  navigate(startPos);
-
-  buttonCheckpoint();
-
-  sprint(goalPos);
-
-  setColor(GREEN);
-
-  while (1) {
-    delay(1);
+  if (target + tolerance < angle) {
+    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain * -1;
+    if (speedHelper < -255) speedHelper = -255;
+    motorR.speed = speedHelper;
+    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain;
+    if (speedHelper > 255) speedHelper = 255;
+    motorL.speed = speedHelper;
+  } else if (target - tolerance > angle) {
+    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain;
+    if (speedHelper < -255) speedHelper = -255;
+    motorR.speed = speedHelper;
+    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain * -1;
+    if (speedHelper > 255) speedHelper = 255;
+    motorL.speed = speedHelper;
+  } else {
+    motorR.speed = 0;
+    motorL.speed = 0;
   }
+
+  // if (millis() - lastUpdate > 2000) {
+  //   if (target == 90) target = 180;
+  //   else target = 90;
+  //   lastUpdate = millis();
+  // }
+
+  target = 180;
+
+  Serial.println(angle);
+  Serial.println(target);
+
+  // struct xyPair_t goalPos;
+  // goalPos.y = GOAL_Y;
+  // goalPos.x = GOAL_X;
+
+  // struct xyPair_t startPos;
+  // startPos.y = START_Y;
+  // startPos.x = START_X;
+
+  // buttonCheckpoint();
+
+  // // navigate(goalPos);
+
+  // // buttonCheckpoint();
+
+  // // navigate(startPos);
+
+  // // buttonCheckpoint();
+
+  // // sprint(goalPos);
+
+  // setColor(GREEN);
+
+  // while (1) {
+  //   delay(1);
+  //   Serial.println(getAngle());
+  // }
 }
