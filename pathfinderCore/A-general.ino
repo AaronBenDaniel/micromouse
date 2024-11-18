@@ -181,6 +181,19 @@ void buttonCheckpoint() {
   delay(3000);
 }
 
+// Integer inpu from Serial
+int16_t getInput() {
+  int choice = 0;
+  while (1) {
+    if (Serial.available() > 0) {
+      char incomingByte = Serial.read();
+      if (incomingByte == '.') break;
+      choice = choice * 10 + incomingByte - '0';
+    }
+  }
+  return (choice);
+}
+
 //Global structs that need to be accessed by multiple functions
 struct matrix_t memory;
 

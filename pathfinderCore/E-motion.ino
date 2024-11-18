@@ -11,7 +11,6 @@
 #define MOTORRIGHTA 16
 #define MOTORRIGHTB 36
 
-#define tolerance 1
 const float trimValue = 19 / 18.4;
 
 class motor_t {
@@ -54,15 +53,15 @@ public:
   void PWMRun() {
     uint16_t onTime;
     if (speed < 0) {
-      if (speed < -255) speed = -255;
-      onTime = map(speed * -1, 0, 255, 0, 1000);
+      if (speed < -255) onTime = 1000;
+      else onTime = map(speed * -1, 0, 255, 0, 1000);
+      back();
     } else {
-      if (speed > 255) speed = 255;
-      onTime = map(speed, 0, 255, 0, 1000);
+      if (speed > 255) onTime = 1000;
+      else onTime = map(speed, 0, 255, 0, 1000);
+      forward();
     }
     uint16_t offTime = 1000 - onTime;
-    if (speed > 0) forward();
-    else back();
     delayMicroseconds(onTime);
     stop();
     delayMicroseconds(offTime);

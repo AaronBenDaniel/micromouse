@@ -40,46 +40,66 @@ void mainSetup() {
 long lastEncoder = 0;
 long lastUpdate = 0;
 float target = 0;
+int16_t integralSum = 0;
+uint8_t proportionalGain = 12;
+uint16_t integralGain = 1;
+cppQueue queue(sizeof(int16_t), 1000, FIFO, false);
 
 void mainLoop() {
   motorR.PWMRun();
   motorL.PWMRun();
 
-  const float proportionalGain = 6;
+  if (Serial.available() > 0)
+    integralGain = getInput();
 
-  float angle = getAngle();
-  int16_t speedHelper;
+  uint16_t angle = getAngle();
 
-  if (target + tolerance < angle) {
-    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain * -1;
-    if (speedHelper < -255) speedHelper = -255;
-    motorR.speed = speedHelper;
-    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain;
-    if (speedHelper > 255) speedHelper = 255;
-    motorL.speed = speedHelper;
-  } else if (target - tolerance > angle) {
-    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain;
-    if (speedHelper < -255) speedHelper = -255;
-    motorR.speed = speedHelper;
-    speedHelper = map((angle - target), 0, 360, 0, 255) * proportionalGain * -1;
-    if (speedHelper > 255) speedHelper = 255;
-    motorL.speed = speedHelper;
+  int16_t queueVar = angle - target;
+
+  queue.push(&queueVar);
+  if (queue.isFull()) queue.pop(&queueVar);
+
+  integralSum = integralSum - queueVar + (angle - target);
+
+  int32_t speed = (map((angle - target), 0, 360, 0, 255) * proportionalGain) + (integralSum * integralGain / 1000);
+
+  Serial.print("Integral Sum:");
+  Serial.print(integralSum);
+  Serial.print(" Integral Gain: ");
+  Serial.print(integralGain);
+  Serial.print(" Integral Contribution: ");
+  Serial.print(integralSum * integralGain / 1000);
+
+  Serial.print(" Angle: ");
+  Serial.print(angle);
+  Serial.print(" Direction: ");
+
+  if (angle > target) {
+    motorR.speed = -1 * speed;
+    motorL.speed = speed;
+
+    Serial.print(" Right");
+  } else if (angle < target) {
+    motorR.speed = -1 * speed;
+    motorL.speed = speed;
+
+    Serial.print(" Left");
   } else {
     motorR.speed = 0;
     motorL.speed = 0;
+
+    Serial.print(" Stop");
   }
 
-  // if (millis() - lastUpdate > 2000) {
-  //   if (target == 90) target = 180;
-  //   else target = 90;
+  // if (millis() - lastUpdate > 5000) {
+  //   target += 90;
+  //   if (target >= 360) target = 90;
   //   lastUpdate = millis();
   // }
 
   target = 180;
 
-  Serial.println(angle);
-  Serial.println(target);
-
+  Serial.print("\n");
   // struct xyPair_t goalPos;
   // goalPos.y = GOAL_Y;
   // goalPos.x = GOAL_X;
