@@ -8,9 +8,9 @@
 #include "general.h"
 #include "IMU.h"
 #include "ToF.h"
+#include "PID.h"
 #include "motion.h"
 #include "navigation.h"
-#include "PID.h"
 
 // Edit these defines to alter the behavior of the mouse
 #define START_Y 11
@@ -60,57 +60,12 @@ int16_t lastSpeed;
 float target = 0;
 
 void loop() {
-    motorR.PWMRun();
-    motorL.PWMRun();
-
-    uint16_t angle = getAngle();
-
-    int16_t error = angle - target;
-
-    Setpoint = target;
-    Setpoint /= 360;
-
-    Input = map(error, -180, 180, 0, 360);
-    Input /= 360;
-
-    myPID.Compute();
-
-    int32_t speed = Output;
-
-    Serial.print("Output: ");
-    Serial.print(speed);
-    Serial.print(" Angle: ");
-    Serial.print(angle);
-    Serial.print(" Error: ");
-    Serial.print(error);
-    Serial.print(" Direction: ");
-
-    if (angle > target) {
-        motorR.speed = -1 * speed;
-        motorL.speed = speed;
-
-        Serial.print(" Right");
-    } else if (angle < target) {
-        motorR.speed = -1 * speed;
-        motorL.speed = speed;
-
-        Serial.print(" Left");
-    } else {
-        motorR.speed = 0;
-        motorL.speed = 0;
-
-        Serial.print(" Stop");
+    if (millis() - lastUpdate > 5000) {
+        turn_right();
+        turn_right();
+        lastUpdate = millis();
     }
-
-    // if (millis() - lastUpdate > 5000) {
-    //   target += 90;
-    //   if (target >= 360) target = 90;
-    //   lastUpdate = millis();
-    // }
-
-    target = 180;
-
-    Serial.print("\n");
+    delay(100);
     // struct xyPair_t goalPos;
     // goalPos.y = GOAL_Y;
     // goalPos.x = GOAL_X;

@@ -79,7 +79,7 @@ class motor_t {
 motor_t motorR(MOTORRIGHTA, MOTORRIGHTB, ENCODERRIGHTA, ENCODERRIGHTB);
 motor_t motorL(MOTORLEFTA, MOTORLEFTB, ENCODERLEFTA, ENCODERLEFTB);
 
-void turn(int16_t speed) {
+void turn(int32_t speed) {
     motorR.speed = -1 * speed;
     motorL.speed = speed;
 }
@@ -112,6 +112,7 @@ void forward(uint8_t number) {
 // NEEDS HARDWARE INTERFACE
 // Turns the mouse 90 degrees right
 void turn_right() {
+    // Updates virtual mouse's direction
     mouse.direction = mouse.direction - 1;
     // accounts for overflow
     // I.E. if the direction was 0, turning right makes the direction -1, but we
@@ -119,8 +120,27 @@ void turn_right() {
     while (mouse.direction < 0) {
         mouse.direction = mouse.direction + 4;
     }
-    // This will actually command the motors to turn on in a certain direction
-    // for a certain amount of time
+
+    // This actually commands the motors to turn make the turn
+    int16_t offset = getAngle();
+    delay(10);
+    offset = getAngle() - 180;
+    int32_t integratedError = 0;
+    Setpoint = 90.0 / 360;
+    while (getAngle(offset) > 100 || getAngle(offset) < 74) {
+        motorR.PWMRun();
+        motorL.PWMRun();
+
+        uint16_t angle = getAngle(offset);
+
+        Input = map(angle - Setpoint, -180, 180, 0, 360);
+        Input /= 360;
+
+        myPID.Compute();
+
+        turn(Output);
+    }
+    delay(300);
 }
 
 // NEEDS HARDWARE INTERFACE

@@ -85,7 +85,7 @@ void quaternionToEulerGI(sh2_GyroIntegratedRV_t *rotational_vector,
                       rotational_vector->j, rotational_vector->k, ypr, degrees);
 }
 
-float getAngle() {
+float getAngle(int16_t offset = 0) {
     if (bno08x.wasReset()) {
         Serial.print("sensor was reset ");
         setReports(reportType, reportIntervalUs);
@@ -105,5 +105,8 @@ float getAngle() {
                 break;
         }
     }
-    return (ypr.yaw + 180);
+    float angle = ypr.yaw + 180 - offset;
+    while (angle >= 360) angle -= 360;
+    while (angle < 0) angle += 360;
+    return (angle);
 }
