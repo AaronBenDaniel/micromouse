@@ -1,2 +1,0 @@
-allow the mouse to require only a relative position of a goal
-allow the mouse to run in an arbitrarily sized maze
