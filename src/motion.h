@@ -79,6 +79,11 @@ class motor_t {
 motor_t motorR(MOTORRIGHTA, MOTORRIGHTB, ENCODERRIGHTA, ENCODERRIGHTB);
 motor_t motorL(MOTORLEFTA, MOTORLEFTB, ENCODERLEFTA, ENCODERLEFTB);
 
+void turn(int16_t speed) {
+    motorR.speed = -1 * speed;
+    motorL.speed = speed;
+}
+
 // NEEDS HARDWARE INTERFACE
 // Moves the mouse forward a given number of cells
 void forward(uint8_t number) {
