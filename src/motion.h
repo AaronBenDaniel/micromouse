@@ -109,6 +109,21 @@ void forward(uint8_t number) {
     // time
 }
 
+void maintainAngle(int16_t target, int16_t offset = 0) {
+    Setpoint = target;
+    Setpoint /= 360.0;
+
+    Input = getAngle(0);
+    Input /= 360;
+
+    myPID.Compute();
+
+    turn(Output);
+
+    motorR.PWMRun();
+    motorL.PWMRun();
+}
+
 // NEEDS HARDWARE INTERFACE
 // Turns the mouse 90 degrees right
 void turn_right() {
@@ -125,20 +140,8 @@ void turn_right() {
     int16_t offset = getAngle();
     delay(10);
     offset = getAngle() - 180;
-    int32_t integratedError = 0;
-    Setpoint = 90.0 / 360;
-    while (getAngle(offset) > 100 || getAngle(offset) < 74) {
-        motorR.PWMRun();
-        motorL.PWMRun();
-
-        uint16_t angle = getAngle(offset);
-
-        Input = map(angle - Setpoint, -180, 180, 0, 360);
-        Input /= 360;
-
-        myPID.Compute();
-
-        turn(Output);
+    while (getAngle(offset) > 91 || getAngle(offset) < 89) {
+        maintainAngle(90, offset);
     }
     delay(300);
 }

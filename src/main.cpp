@@ -60,12 +60,47 @@ int16_t lastSpeed;
 float target = 0;
 
 void loop() {
-    if (millis() - lastUpdate > 5000) {
-        turn_right();
-        turn_right();
-        lastUpdate = millis();
-    }
-    delay(100);
+    // if (Serial.available()) {
+    //     int choice = 0;
+    //     char incomingByte;
+    //     while (1) {
+    //         if (Serial.available() > 0) {
+    //             incomingByte = Serial.read();
+    //             if (incomingByte < '0' || incomingByte > '9') break;
+    //             choice = choice * 10 + incomingByte - '0';
+    //         }
+    //     }
+    //     if (incomingByte == 'p') {
+    //         Kp = choice;
+    //         myPID.SetTunings(choice, Ki, Kd);
+    //     } else if (incomingByte == 'i') {
+    //         Ki = choice;
+    //         myPID.SetTunings(Kp, choice, Kd);
+    //     } else if (incomingByte == 'd') {
+    //         Kd = choice;
+    //         myPID.SetTunings(Kp, Ki, choice);
+    //     } else
+    //         for (int i = 0; i < 1000; i++) Serial.println("WHAT!");
+    // }
+    // Serial.print("Kp: ");
+    // Serial.print(Kp);
+    // Serial.print(" Ki: ");
+    // Serial.print(Ki);
+    // Serial.print(" Kd: ");
+    // Serial.print(Kd);
+    // Serial.print("\n");
+
+    maintainAngle(180);
+
+
+
+    // if (millis() - lastUpdate > 5000) {
+    //     turn_right();
+    //     turn_right();
+    //     lastUpdate = millis();
+    // }
+    // delay(100);
+
     // struct xyPair_t goalPos;
     // goalPos.y = GOAL_Y;
     // goalPos.x = GOAL_X;
