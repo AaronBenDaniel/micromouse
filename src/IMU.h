@@ -34,27 +34,6 @@ void setReports(sh2_SensorId_t reportType, long report_interval) {
     }
 }
 
-void IMUInit() {
-    Serial.println("Adafruit BNO08x test!");
-
-    // Try to initialize!
-    if (!bno08x.begin_I2C()) {
-        // if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300
-        // byte UART buffer! if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
-        Serial.println("Failed to find BNO08x chip");
-        setColor(RED);
-        while (1) {
-            delay(10);
-        }
-    }
-    Serial.println("BNO08x Found!");
-
-    setReports(reportType, reportIntervalUs);
-
-    Serial.println("Reading events");
-    delay(100);
-}
-
 void quaternionToEuler(float qr, float qi, float qj, float qk, euler_t *ypr,
                        bool degrees = false) {
     float sqr = sq(qr);
@@ -109,4 +88,39 @@ float getAngle(int16_t offset = 0) {
     while (angle >= 360) angle -= 360;
     while (angle < 0) angle += 360;
     return (angle);
+}
+
+void IMUInit() {
+    Serial.println("Adafruit BNO08x test!");
+
+    // Try to initialize!
+    if (!bno08x.begin_I2C()) {
+        // if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300
+        // byte UART buffer! if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
+        Serial.println("Failed to find BNO08x chip");
+        setColor(RED);
+        while (1) {
+            delay(10);
+        }
+    }
+    Serial.println("BNO08x Found!");
+
+    setReports(reportType, reportIntervalUs);
+
+    Serial.println("Reading events");
+    delay(100);
+}
+
+void initGlobalOffset(uint8_t start) {
+    globalOffset = getAngle();
+    delay(100);
+    globalOffset = getAngle();
+    if (start == RIGHT)
+        globalOffset -= 0;
+    else if (start == UP)
+        globalOffset -= 90;
+    else if (start == LEFT)
+        globalOffset -= 180;
+    else if (start == DOWN)
+        globalOffset -= 270;
 }

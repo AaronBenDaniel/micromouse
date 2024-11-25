@@ -1,17 +1,18 @@
-#define ENCODERLEFTA 9
-#define ENCODERLEFTB 8
-#define ENCODERRIGHTA 17
-#define ENCODERRIGHTB 18
-#define GEARRATIO 50
-#define ENCODERRATIO 12
+#define ENCODER_LEFT_A 9
+#define ENCODER_LEFT_B 8
+#define ENCODER_RIGHT_A 17
+#define ENCODER_RIGHT_B 18
+#define GEAR_RATIO 50
+#define ENCODER_RATIO 12
 #define CIRCUMFERENCE 69
 
-#define MOTORLEFTA 35
-#define MOTORLEFTB 37
-#define MOTORRIGHTA 16
-#define MOTORRIGHTB 36
+#define MOTOR_LEFT_A 35
+#define MOTOR_LEFT_B 37
+#define MOTOR_RIGHT_A 16
+#define MOTOR_RIGHT_B 36
 
-const float trimValue = 19 / 18.4;
+const float TRIM_VALUE = 19 / 18.4;
+const float TURN_TRIM = 1.1;
 
 class motor_t {
    public:
@@ -31,8 +32,8 @@ class motor_t {
     }
 
     float getDistance() {
-        return (encoder.getCount() * ENCODERRATIO * GEARRATIO * CIRCUMFERENCE *
-                trimValue);
+        return (encoder.getCount() * ENCODER_RATIO * GEAR_RATIO *
+                CIRCUMFERENCE * TRIM_VALUE);
     }
 
     int getCount() { return (encoder.getCount()); }
@@ -76,12 +77,14 @@ class motor_t {
     ESP32Encoder encoder;
 };
 
-motor_t motorR(MOTORRIGHTA, MOTORRIGHTB, ENCODERRIGHTA, ENCODERRIGHTB);
-motor_t motorL(MOTORLEFTA, MOTORLEFTB, ENCODERLEFTA, ENCODERLEFTB);
+motor_t motorR(MOTOR_RIGHT_A, MOTOR_RIGHT_B, ENCODER_RIGHT_A, ENCODER_RIGHT_B);
+motor_t motorL(MOTOR_LEFT_A, MOTOR_LEFT_B, ENCODER_LEFT_A, ENCODER_LEFT_B);
 
-void turn(int32_t speed) {
+void rotate(int32_t speed) {
     motorR.speed = -1 * speed;
     motorL.speed = speed;
+    if (motorR.speed < 0) motorR.speed *= TURN_TRIM;
+    if (motorL.speed < 0) motorL.speed *= TURN_TRIM;
 }
 
 // NEEDS HARDWARE INTERFACE
@@ -113,57 +116,58 @@ void maintainAngle(int16_t target, int16_t offset = 0) {
     Setpoint = target;
     Setpoint /= 360.0;
 
-    Input = getAngle(0);
+    Input = getAngle(offset);
     Input /= 360;
 
     myPID.Compute();
 
-    turn(Output);
+    rotate(Output);
 
     motorR.PWMRun();
     motorL.PWMRun();
 }
 
-// NEEDS HARDWARE INTERFACE
-// Turns the mouse 90 degrees right
-void turn_right() {
+void turn(int8_t direction) {
+    // This actually commands the motors to turn make the turn
+    int16_t offset = globalOffset;
+    if (mouse.direction == RIGHT)
+        offset += 180;
+    else if (mouse.direction == UP)
+        offset += 90;
+    else if (mouse.direction == LEFT)
+        offset += 0;
+    else if (mouse.direction == DOWN)
+        offset -= 90;
+
+    uint32_t start = millis();
+    int16_t target;
+
+    if (direction == TURN_RIGHT)
+        target = 90;
+    else if (direction == TURN_LEFT)
+        target = 270;
+    else if (direction == TURN_AROUND) {
+        target = 270;
+        offset += 90;
+    }
+    while (millis() - start < 2500) {
+        maintainAngle(target, offset);
+    }
+
     // Updates virtual mouse's direction
-    mouse.direction = mouse.direction - 1;
+    mouse.direction += direction;
     // accounts for overflow
     // I.E. if the direction was 0, turning right makes the direction -1, but we
     // want that to stay within 0-3
-    while (mouse.direction < 0) {
-        mouse.direction = mouse.direction + 4;
-    }
-
-    // This actually commands the motors to turn make the turn
-    int16_t offset = getAngle();
-    delay(10);
-    offset = getAngle() - 180;
-    while (getAngle(offset) > 91 || getAngle(offset) < 89) {
-        maintainAngle(90, offset);
-    }
-    delay(300);
-}
-
-// NEEDS HARDWARE INTERFACE
-void turn_left() {
-    mouse.direction = mouse.direction + 1;
-    // accounts for overflow
-    // I.E. if the direction was 3, turning left makes the direction 4, but we
-    // want that to stay within 0-3
-    while (mouse.direction > 3) {
-        mouse.direction = mouse.direction - 4;
-    }
-    // This will actually command the motors to turn on in a certain direction
-    // for a certain amount of time
+    while (mouse.direction < 0) mouse.direction += 4;
+    while (mouse.direction > 3) mouse.direction -= 4;
 }
 
 // This function takes a move as input, positions the mouse to make it, and then
 // makes the move
 void makeMove(uint8_t move, uint8_t number) {
     // don't do anything if the move in NOMOVE
-    if (move == NOMOVE) {
+    if (move == NO_MOVE) {
         return;
     }
     // Turns the mouse to face the proper direction
@@ -171,56 +175,52 @@ void makeMove(uint8_t move, uint8_t number) {
         case RIGHT:
             switch (mouse.direction) {
                 case UP:
-                    turn_right();
+                    turn(TURN_RIGHT);
                     break;
                 case LEFT:
-                    turn_right();
-                    turn_right();
+                    turn(TURN_AROUND);
                     break;
                 case DOWN:
-                    turn_left();
+                    turn(TURN_LEFT);
                     break;
             }
             break;
         case UP:
             switch (mouse.direction) {
                 case RIGHT:
-                    turn_left();
+                    turn(TURN_LEFT);
                     break;
                 case LEFT:
-                    turn_right();
+                    turn(TURN_RIGHT);
                     break;
                 case DOWN:
-                    turn_right();
-                    turn_right();
+                    turn(TURN_AROUND);
                     break;
             }
             break;
         case LEFT:
             switch (mouse.direction) {
                 case RIGHT:
-                    turn_right();
-                    turn_right();
+                    turn(TURN_AROUND);
                     break;
                 case UP:
-                    turn_left();
+                    turn(TURN_LEFT);
                     break;
                 case DOWN:
-                    turn_right();
+                    turn(TURN_RIGHT);
                     break;
             }
             break;
         case DOWN:
             switch (mouse.direction) {
                 case RIGHT:
-                    turn_right();
+                    turn(TURN_RIGHT);
                     break;
                 case UP:
-                    turn_right();
-                    turn_right();
+                    turn(TURN_AROUND);
                     break;
                 case LEFT:
-                    turn_left();
+                    turn(TURN_LEFT);
                     break;
             }
             break;

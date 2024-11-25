@@ -1,8 +1,8 @@
 struct matrix_t updateCellDistance(struct matrix_t distances,
                                    struct xyPair_t cell) {
     // check if cell is in bounds
-    if (cell.y < 0 || cell.y > MAXMAZESIZE - 2 || cell.x < 0 ||
-        cell.x > MAXMAZESIZE - 2) {
+    if (cell.y < 0 || cell.y > MAX_MAZE_SIZE - 2 || cell.x < 0 ||
+        cell.x > MAX_MAZE_SIZE - 2) {
         return (distances);
     }
 
@@ -22,8 +22,8 @@ struct matrix_t updateCellDistance(struct matrix_t distances,
         currentCell.y = cellNeighbors.direction[i].y;
 
         // check if current cell is in bounds
-        if (currentCell.y < 0 || currentCell.y > MAXMAZESIZE - 1 ||
-            currentCell.x < 0 || currentCell.x > MAXMAZESIZE - 1) {
+        if (currentCell.y < 0 || currentCell.y > MAX_MAZE_SIZE - 1 ||
+            currentCell.x < 0 || currentCell.x > MAX_MAZE_SIZE - 1) {
             continue;
         }
 
@@ -70,16 +70,16 @@ struct matrix_t calcDistances(struct xyPair_t rootCell) {
     struct matrix_t distances;  // matrix that contains the distance each cell
                                 // is from the root
 
-    // initialize distances matrix to all MAXDISTANCE
-    for (uint8_t y = 0; y < MAXMAZESIZE; y++) {
-        for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
-            distances.matrix[y][x] = MAXDISTANCE;
+    // initialize distances matrix to all MAX_DISTANCE
+    for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
+        for (uint8_t x = 0; x < MAX_MAZE_SIZE; x++) {
+            distances.matrix[y][x] = MAX_DISTANCE;
         }
     }
 
     // check if root cell is in bounds
-    if (rootCell.y < 0 || rootCell.y > MAXMAZESIZE - 2 || rootCell.x < 0 ||
-        rootCell.x > MAXMAZESIZE - 2) {
+    if (rootCell.y < 0 || rootCell.y > MAX_MAZE_SIZE - 2 || rootCell.x < 0 ||
+        rootCell.x > MAX_MAZE_SIZE - 2) {
         Serial.println("INVALID ROOT CELL");
         return (distances);
     }
@@ -123,7 +123,7 @@ struct matrix_t calcDistances(struct xyPair_t rootCell) {
 uint8_t nextMove(struct xyPair_t targetCell) {
     // is the mouse already at the target coords?
     if (mouse.pos.y == targetCell.y && mouse.pos.x == targetCell.x) {
-        return NOMOVE;
+        return NO_MOVE;
     }
 
     // calculate distances
@@ -143,8 +143,8 @@ uint8_t nextMove(struct xyPair_t targetCell) {
         cellDirection = bias[mouse.direction][i];
 
         // check if cell is in bounds
-        if (cell.y < 0 || cell.y > MAXMAZESIZE - 2 || cell.x < 0 ||
-            cell.x > MAXMAZESIZE - 2) {
+        if (cell.y < 0 || cell.y > MAX_MAZE_SIZE - 2 || cell.x < 0 ||
+            cell.x > MAX_MAZE_SIZE - 2) {
             continue;
         }
 
@@ -180,7 +180,7 @@ uint8_t nextMove(struct xyPair_t targetCell) {
     // What would the point even be?
     setColor(RED);
     Serial.println("UNSOLVABLE MAZE");
-    return NOMOVE;
+    return NO_MOVE;
 }
 
 void navigate(struct xyPair_t destination) {
@@ -190,13 +190,13 @@ void navigate(struct xyPair_t destination) {
     // though After the start, it will never need to measure behind it
     setColor(YELLOW);
     measure();
-    turn_right();
+    turn(TURN_RIGHT);
     measure();
-    turn_left();  // THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
+    turn(TURN_LEFT);  // THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
     uint8_t move = 0;
     // while loop continuously to calculate the best next move, makes it, and
     // then measure its surroundings
-    while (move != NOMOVE) {
+    while (move != NO_MOVE) {
         move = nextMove(destination);
         makeMove(move, 1);
         Serial.print("\nMade move: \"");
@@ -218,11 +218,11 @@ void sprint(struct xyPair_t goal) {
     realPos = mouse.pos;
     uint8_t realDirection = mouse.direction;
     // initialize the list of moves
-    uint8_t moves[MAXDISTANCE];
+    uint8_t moves[MAX_DISTANCE];
     uint8_t move = 0;
     uint8_t moveCounter = 0;
     Serial.println("\nCalculating shortest path");
-    while (move != NOMOVE) {
+    while (move != NO_MOVE) {
         // calculate the best next move
         move = nextMove(goal);
         // virtually execute the move

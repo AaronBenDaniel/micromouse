@@ -32,15 +32,15 @@ void setup() {
     initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
 
     // initialize memory to all 0
-    for (uint8_t y = 0; y < MAXMAZESIZE; y++) {
-        for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
+    for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
+        for (uint8_t x = 0; x < MAX_MAZE_SIZE; x++) {
             memory.matrix[y][x] = 0;
         }
     }
 
     // // FOR TESTING PURPOSES ONLY
-    // for (uint8_t y = 0; y < MAXMAZESIZE; y++) {
-    //   for (uint8_t x = 0; x < MAXMAZESIZE; x++) {
+    // for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
+    //   for (uint8_t x = 0; x < MAX_MAZE_SIZE; x++) {
     //     memory.matrix[y][x] = maze.matrix[y][x];
     //   }
     // }
@@ -52,6 +52,7 @@ void setup() {
     setColor(BLUE);
     delay(3000);  // FOR DEVELOPMENT PURPOSES ONLY REMOVE EVENTUALLY
     setColor(GREEN);
+    initGlobalOffset(START_DIRECTION);
 }
 
 long lastEncoder = 0;
@@ -90,13 +91,14 @@ void loop() {
     // Serial.print(Kd);
     // Serial.print("\n");
 
-    maintainAngle(180);
+    // maintainAngle(180);
 
-
-
-    // if (millis() - lastUpdate > 5000) {
-    //     turn_right();
-    //     turn_right();
+    // if (millis() - lastUpdate > 1000) {
+    turn(TURN_RIGHT);
+    turn(TURN_LEFT);
+    turn(TURN_LEFT);
+    turn(TURN_AROUND);
+    delay(1000);
     //     lastUpdate = millis();
     // }
     // delay(100);
