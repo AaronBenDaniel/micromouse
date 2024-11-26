@@ -1,18 +1,19 @@
-#define ENCODER_LEFT_A 9
-#define ENCODER_LEFT_B 8
+#define ENCODER_LEFT_A 8
+#define ENCODER_LEFT_B 9
 #define ENCODER_RIGHT_A 17
 #define ENCODER_RIGHT_B 18
 #define GEAR_RATIO 50
 #define ENCODER_RATIO 12
-#define CIRCUMFERENCE 69
+#define CIRCUMFERENCE 71
 
 #define MOTOR_LEFT_A 35
 #define MOTOR_LEFT_B 37
 #define MOTOR_RIGHT_A 16
 #define MOTOR_RIGHT_B 36
 
-const float TRIM_VALUE = 19 / 18.4;
+const float ENCODER_TRIM_VALUE = 19 / 18.4;
 const float TURN_TRIM = 1.1;
+const float FORWARD_TURN_TRIM = 1.2;
 
 class motor_t {
    public:
@@ -33,10 +34,10 @@ class motor_t {
 
     float getDistance() {
         return (encoder.getCount() * ENCODER_RATIO * GEAR_RATIO *
-                CIRCUMFERENCE * TRIM_VALUE);
+                CIRCUMFERENCE * ENCODER_TRIM_VALUE);
     }
 
-    int getCount() { return (encoder.getCount()); }
+    int32_t getCount() { return (encoder.getCount()); }
 
     void forward() {
         digitalWrite(motorA, LOW);
@@ -107,21 +108,50 @@ void forward(uint8_t number) {
                 break;
         }
     }
-    delay(200);  // TESTING ONLY PLEASE REMOVE THIS LINE
-    // This will actually command the motors to turn on for a certain amount of
-    // time
+
+    int32_t encoderOffsetL = motorL.getCount();
+    int32_t encoderOffsetR = motorL.getCount();
+    int16_t target =
+        number * MAZE_CELL_SIZE * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
+    uint32_t start = millis();
+    while (millis() - start < 2500) {
+        // Motor L
+        LinearLSetpoint = target * FORWARD_TURN_TRIM;
+        LinearLSetpoint /= 5000;
+
+        LinearLInput = motorL.getCount() - encoderOffsetL;
+        LinearLInput /= 5000;
+
+        LinearLPID.Compute();
+
+        motorL.speed = LinearLOutput;
+
+        // MotorR
+        LinearRSetpoint = target;
+        LinearRSetpoint /= 5000;
+
+        LinearRInput = motorR.getCount() - encoderOffsetR;
+        LinearRInput /= 5000;
+
+        LinearRPID.Compute();
+
+        motorR.speed = LinearROutput;
+
+        motorR.PWMRun();
+        motorL.PWMRun();
+    }
 }
 
 void maintainAngle(int16_t target, int16_t offset = 0) {
-    Setpoint = target;
-    Setpoint /= 360.0;
+    RotationalSetpoint = target;
+    RotationalSetpoint /= 360.0;
 
-    Input = getAngle(offset);
-    Input /= 360;
+    RotationalInput = getAngle(offset);
+    RotationalInput /= 360;
 
-    myPID.Compute();
+    RotationalPID.Compute();
 
-    rotate(Output);
+    rotate(RotationalOutput);
 
     motorR.PWMRun();
     motorL.PWMRun();

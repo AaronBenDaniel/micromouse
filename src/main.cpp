@@ -24,9 +24,16 @@ void setup() {
     setColor(YELLOW);
     IMUInit();
     pinMode(0, INPUT_PULLUP);
-    myPID.SetMode(AUTOMATIC);
-    myPID.SetOutputLimits(-255, 255);
-    myPID.SetSampleTime(10);
+
+    RotationalPID.SetMode(AUTOMATIC);
+    RotationalPID.SetOutputLimits(-255, 255);
+    RotationalPID.SetSampleTime(10);
+    LinearLPID.SetMode(AUTOMATIC);
+    LinearLPID.SetOutputLimits(-40, 255);
+    LinearLPID.SetSampleTime(10);
+    LinearRPID.SetMode(AUTOMATIC);
+    LinearRPID.SetOutputLimits(-255, 255);
+    LinearRPID.SetSampleTime(10);
 
     Serial.begin(19200);
     initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
@@ -72,33 +79,38 @@ void loop() {
     //         }
     //     }
     //     if (incomingByte == 'p') {
-    //         Kp = choice;
-    //         myPID.SetTunings(choice, Ki, Kd);
+    //         LinearKp = choice;
+    //         LinearPID.SetTunings(choice, LinearKi, LinearKd);
     //     } else if (incomingByte == 'i') {
-    //         Ki = choice;
-    //         myPID.SetTunings(Kp, choice, Kd);
+    //         LinearKi = choice;
+    //         LinearPID.SetTunings(LinearKp, choice, LinearKd);
     //     } else if (incomingByte == 'd') {
-    //         Kd = choice;
-    //         myPID.SetTunings(Kp, Ki, choice);
+    //         LinearKd = choice;
+    //         LinearPID.SetTunings(LinearKp, LinearKi, choice);
     //     } else
     //         for (int i = 0; i < 1000; i++) Serial.println("WHAT!");
     // }
     // Serial.print("Kp: ");
-    // Serial.print(Kp);
+    // Serial.print(LinearKp);
     // Serial.print(" Ki: ");
-    // Serial.print(Ki);
+    // Serial.print(LinearKi);
     // Serial.print(" Kd: ");
-    // Serial.print(Kd);
+    // Serial.print(LinearKd);
     // Serial.print("\n");
 
-    // maintainAngle(180);
+    forward(1);
+    // turn(TURN_RIGHT);
+    // turn(TURN_RIGHT);
+    // forward(1);
+    // turn(TURN_LEFT);
+    // turn(TURN_LEFT);
 
     // if (millis() - lastUpdate > 1000) {
-    turn(TURN_RIGHT);
-    turn(TURN_LEFT);
-    turn(TURN_LEFT);
-    turn(TURN_AROUND);
-    delay(1000);
+    // turn(TURN_RIGHT);
+    // turn(TURN_LEFT);
+    // turn(TURN_LEFT);
+    // turn(TURN_AROUND);
+    // delay(1000);
     //     lastUpdate = millis();
     // }
     // delay(100);
