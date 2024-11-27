@@ -13,7 +13,7 @@
 
 const float ENCODER_TRIM_VALUE = 19 / 18.4;
 const float TURN_TRIM = 1.1;
-const float FORWARD_TURN_TRIM = 1.2;
+const float FORWARD_TURN_TRIM = 1;
 
 class motor_t {
    public:
@@ -110,7 +110,7 @@ void forward(uint8_t number) {
     }
 
     int32_t encoderOffsetL = motorL.getCount();
-    int32_t encoderOffsetR = motorL.getCount();
+    int32_t encoderOffsetR = motorR.getCount();
     int16_t target =
         number * MAZE_CELL_SIZE * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
     uint32_t start = millis();
@@ -139,6 +139,10 @@ void forward(uint8_t number) {
 
         motorR.PWMRun();
         motorL.PWMRun();
+
+        Serial.print(motorL.getCount());
+        Serial.print(" ");
+        Serial.println(motorR.getCount());
     }
 }
 

@@ -29,7 +29,7 @@ void setup() {
     RotationalPID.SetOutputLimits(-255, 255);
     RotationalPID.SetSampleTime(10);
     LinearLPID.SetMode(AUTOMATIC);
-    LinearLPID.SetOutputLimits(-40, 255);
+    LinearLPID.SetOutputLimits(-255, 255);
     LinearLPID.SetSampleTime(10);
     LinearRPID.SetMode(AUTOMATIC);
     LinearRPID.SetOutputLimits(-255, 255);
@@ -98,12 +98,9 @@ void loop() {
     // Serial.print(LinearKd);
     // Serial.print("\n");
 
+    for(uint8_t i=0;i<4;i++){
     forward(1);
-    // turn(TURN_RIGHT);
-    // turn(TURN_RIGHT);
-    // forward(1);
-    // turn(TURN_LEFT);
-    // turn(TURN_LEFT);
+    turn(TURN_RIGHT);}
 
     // if (millis() - lastUpdate > 1000) {
     // turn(TURN_RIGHT);
