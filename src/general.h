@@ -7,8 +7,8 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define LEFT 2
 #define DOWN 3
 #define NO_MOVE 4
-#define TURN_RIGHT 1
-#define TURN_LEFT -1
+#define TURN_RIGHT -1
+#define TURN_LEFT 1
 #define TURN_AROUND 2
 #define MAX_MAZE_SIZE 13
 #define MAX_DISTANCE 255
@@ -190,6 +190,12 @@ int16_t getInput() {
         }
     }
     return (choice);
+}
+
+void failure() {
+    setColor(RED);
+    Serial.println("Something went wrong");
+    while (1);
 }
 
 // Global structs that need to be accessed by multiple functions

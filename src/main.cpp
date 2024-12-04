@@ -4,6 +4,8 @@
 #include <ESP32Encoder.h>  // https://github.com/madhephaestus/ESP32Encoder.git
 #include <cppQueue.h>      // Navigation
 #include <PID_v1.h>        // PID
+#include <Wire.h>          // ToF
+#include "Adafruit_VL53L0X.h"  // ToF
 
 #include "general.h"
 #include "IMU.h"
@@ -13,17 +15,23 @@
 #include "navigation.h"
 
 // Edit these defines to alter the behavior of the mouse
-#define START_Y 11
+#define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 9
-#define GOAL_X 10
+#define GOAL_Y 2
+#define GOAL_X 2
 
 void setup() {
+    Serial.begin(19200);
     pixelInit();
     setColor(YELLOW);
     IMUInit();
+    setColor(OFF);
     pinMode(0, INPUT_PULLUP);
+    Wire.begin();
+    ToF_Left.init();
+    ToF_Front.init();
+    ToF_Right.init();
 
     RotationalPID.SetMode(AUTOMATIC);
     RotationalPID.SetOutputLimits(-255, 255);
@@ -35,8 +43,7 @@ void setup() {
     LinearRPID.SetOutputLimits(-255, 255);
     LinearRPID.SetSampleTime(10);
 
-    Serial.begin(19200);
-    initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
+    // initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
 
     // initialize memory to all 0
     for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
@@ -56,9 +63,6 @@ void setup() {
     mouse.direction = START_DIRECTION;
     mouse.pos.y = START_Y;
     mouse.pos.x = START_X;
-    setColor(BLUE);
-    delay(3000);  // FOR DEVELOPMENT PURPOSES ONLY REMOVE EVENTUALLY
-    setColor(GREEN);
     initGlobalOffset(START_DIRECTION);
 }
 
@@ -98,9 +102,18 @@ void loop() {
     // Serial.print(LinearKd);
     // Serial.print("\n");
 
-    for(uint8_t i=0;i<4;i++){
-    forward(1);
-    turn(TURN_RIGHT);}
+    // Serial.print("Left: ");
+    // Serial.print(ToF_Left.detectWall());
+    // Serial.print(" Front: ");
+    // Serial.print(ToF_Front.detectWall());
+    // Serial.print(" Right: ");
+    // Serial.print(ToF_Right.detectWall());
+    // Serial.print("\n");
+
+    // for (uint8_t i = 0; i < 4; i++) {
+    //     forward(1);
+    //     turn(TURN_RIGHT);
+    // }
 
     // if (millis() - lastUpdate > 1000) {
     // turn(TURN_RIGHT);
@@ -112,6 +125,15 @@ void loop() {
     // }
     // delay(100);
 
+    setColor(GREEN);
+    turn(TURN_RIGHT);
+    turn(TURN_LEFT);
+    setColor(BLUE);
+    turn(TURN_LEFT);
+    turn(TURN_RIGHT);
+
+    buttonCheckpoint();
+
     // struct xyPair_t goalPos;
     // goalPos.y = GOAL_Y;
     // goalPos.x = GOAL_X;
@@ -122,7 +144,7 @@ void loop() {
 
     // buttonCheckpoint();
 
-    // // navigate(goalPos);
+    // navigate(goalPos);
 
     // // buttonCheckpoint();
 
@@ -135,7 +157,6 @@ void loop() {
     // setColor(GREEN);
 
     // while (1) {
-    //   delay(1);
-    //   Serial.println(getAngle());
+    //     delay(1);
     // }
 }

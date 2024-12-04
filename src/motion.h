@@ -139,10 +139,6 @@ void forward(uint8_t number) {
 
         motorR.PWMRun();
         motorL.PWMRun();
-
-        Serial.print(motorL.getCount());
-        Serial.print(" ");
-        Serial.println(motorR.getCount());
     }
 }
 
@@ -195,6 +191,9 @@ void turn(int8_t direction) {
     // want that to stay within 0-3
     while (mouse.direction < 0) mouse.direction += 4;
     while (mouse.direction > 3) mouse.direction -= 4;
+    Serial.print("\nCurrent direction: ");
+    printMove(mouse.direction);
+    Serial.print("\n");
 }
 
 // This function takes a move as input, positions the mouse to make it, and then
