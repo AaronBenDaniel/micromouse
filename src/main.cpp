@@ -18,15 +18,16 @@
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 2
-#define GOAL_X 2
+#define GOAL_Y 1
+#define GOAL_X 1
 
 void setup() {
     Serial.begin(19200);
+    delay(1000);
+    Serial.println("Serial Init");
     pixelInit();
     setColor(YELLOW);
     IMUInit();
-    setColor(OFF);
     pinMode(0, INPUT_PULLUP);
     Wire.begin();
     ToF_Left.init();
@@ -125,26 +126,26 @@ void loop() {
     // }
     // delay(100);
 
-    setColor(GREEN);
-    turn(TURN_RIGHT);
-    turn(TURN_LEFT);
-    setColor(BLUE);
-    turn(TURN_LEFT);
-    turn(TURN_RIGHT);
-
-    buttonCheckpoint();
-
-    // struct xyPair_t goalPos;
-    // goalPos.y = GOAL_Y;
-    // goalPos.x = GOAL_X;
-
-    // struct xyPair_t startPos;
-    // startPos.y = START_Y;
-    // startPos.x = START_X;
+    // setColor(GREEN);
+    // turn(TURN_RIGHT);
+    // turn(TURN_LEFT);
+    // setColor(BLUE);
+    // turn(TURN_LEFT);
+    // turn(TURN_RIGHT);
 
     // buttonCheckpoint();
 
-    // navigate(goalPos);
+    struct xyPair_t goalPos;
+    goalPos.y = GOAL_Y;
+    goalPos.x = GOAL_X;
+
+    struct xyPair_t startPos;
+    startPos.y = START_Y;
+    startPos.x = START_X;
+
+    buttonCheckpoint();
+
+    navigate(goalPos);
 
     // // buttonCheckpoint();
 
@@ -154,9 +155,9 @@ void loop() {
 
     // // sprint(goalPos);
 
-    // setColor(GREEN);
+    setColor(GREEN);
 
-    // while (1) {
-    //     delay(1);
-    // }
+    while (1) {
+        delay(1);
+    }
 }

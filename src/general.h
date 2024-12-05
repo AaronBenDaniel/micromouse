@@ -7,12 +7,12 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define LEFT 2
 #define DOWN 3
 #define NO_MOVE 4
-#define TURN_RIGHT -1
-#define TURN_LEFT 1
+#define TURN_RIGHT 1
+#define TURN_LEFT -1
 #define TURN_AROUND 2
 #define MAX_MAZE_SIZE 13
 #define MAX_DISTANCE 255
-#define MAZE_CELL_SIZE 90
+#define MAZE_CELL_SIZE 175
 
 // Neopixel color consts
 const uint8_t GREEN = 0, BLUE = 1, YELLOW = 2, RED = 3, OFF = 4;
@@ -192,10 +192,18 @@ int16_t getInput() {
     return (choice);
 }
 
-void failure() {
-    setColor(RED);
-    Serial.println("Something went wrong");
-    while (1);
+void failure(uint8_t code) {
+    Serial.print("ERROR CODE: ");
+    Serial.println(code);
+    while (1) {
+        for (uint8_t i = 0; i < code; i++) {
+            setColor(RED);
+            delay(500);
+            setColor(OFF);
+            delay(500);
+        }
+        delay(1000);
+    }
 }
 
 // Global structs that need to be accessed by multiple functions

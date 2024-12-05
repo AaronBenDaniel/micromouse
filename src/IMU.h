@@ -98,7 +98,7 @@ void IMUInit() {
         // if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300
         // byte UART buffer! if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
         Serial.println("Failed to find BNO08x chip");
-        failure();
+        failure(1);
     }
     Serial.println("BNO08x Found!");
 

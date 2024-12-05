@@ -9,7 +9,7 @@ class ToF_t {
         if (!sensor.begin()) {
             Serial.print("Failed to find ToF sensor ");
             Serial.println(id);
-            while (1);
+            failure(2);
         }
     }
 
@@ -23,7 +23,7 @@ class ToF_t {
             return (9999);
     }
 
-    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE); }
+    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE/2); }
 
    private:
     uint8_t id;
@@ -43,8 +43,8 @@ ToF_t ToF_Right(1);
 ToF_t ToF_Left(2);
 
 void addWall(uint8_t direction) {
-    if (direction > 3) direction -= 4;
-    if (direction < 0) direction += 4;
+    while (direction > 3) direction -= 4;
+    while (direction < 0) direction += 4;
 
     if (direction == RIGHT) {
         if (memory.matrix[mouse.pos.y][mouse.pos.x + 1] == 1)
@@ -67,8 +67,12 @@ void addWall(uint8_t direction) {
         else if (memory.matrix[mouse.pos.y + 1][mouse.pos.x] == 0)
             memory.matrix[mouse.pos.y + 1][mouse.pos.x] = 1;
     } else {
-        failure();
-        while (1);
+        while (1) {
+            setColor(OFF);
+            delay(500);
+            setColor(RED);
+            delay(500);
+        }
     }
 }
 

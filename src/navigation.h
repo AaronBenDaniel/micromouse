@@ -179,7 +179,7 @@ uint8_t nextMove(struct xyPair_t targetCell) {
     // The mouse should never be put in an unsolvable maze
     // What would the point even be?
     Serial.println("UNSOLVABLE MAZE");
-    failure();
+    failure(3);
     return NO_MOVE;
 }
 

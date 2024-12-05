@@ -160,32 +160,19 @@ void maintainAngle(int16_t target, int16_t offset = 0) {
 void turn(int8_t direction) {
     // This actually commands the motors to turn make the turn
     int16_t offset = globalOffset;
-    if (mouse.direction == RIGHT)
+    if (mouse.direction == LEFT)
         offset += 180;
     else if (mouse.direction == UP)
         offset += 90;
-    else if (mouse.direction == LEFT)
+    else if (mouse.direction == RIGHT)
         offset += 0;
     else if (mouse.direction == DOWN)
-        offset -= 90;
+        offset += 270;
 
-    uint32_t start = millis();
-    int16_t target;
 
-    if (direction == TURN_RIGHT)
-        target = 90;
-    else if (direction == TURN_LEFT)
-        target = 270;
-    else if (direction == TURN_AROUND) {
-        target = 270;
-        offset += 90;
-    }
-    while (millis() - start < 2500) {
-        maintainAngle(target, offset);
-    }
-
+    // INTERMISSION
     // Updates virtual mouse's direction
-    mouse.direction += direction;
+    mouse.direction -= direction;
     // accounts for overflow
     // I.E. if the direction was 0, turning right makes the direction -1, but we
     // want that to stay within 0-3
@@ -194,6 +181,22 @@ void turn(int8_t direction) {
     Serial.print("\nCurrent direction: ");
     printMove(mouse.direction);
     Serial.print("\n");
+    // END INTERMISSION
+
+    uint32_t start = millis();
+    int16_t target;
+
+    if (direction == TURN_RIGHT)
+        target = 270;
+    else if (direction == TURN_LEFT)
+        target = 90;
+    else if (direction == TURN_AROUND) {
+        target = 270;
+        offset += 90;
+    }
+    while (millis() - start < 2500) {
+        maintainAngle(target, offset);
+    }
 }
 
 // This function takes a move as input, positions the mouse to make it, and then
