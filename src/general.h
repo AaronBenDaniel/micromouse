@@ -12,7 +12,7 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define TURN_AROUND 2
 #define MAX_MAZE_SIZE 13
 #define MAX_DISTANCE 255
-#define MAZE_CELL_SIZE 175
+#define MAZE_CELL_SIZE 90
 
 // Neopixel color consts
 const uint8_t GREEN = 0, BLUE = 1, YELLOW = 2, RED = 3, OFF = 4;

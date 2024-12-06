@@ -161,13 +161,13 @@ void turn(int8_t direction) {
     // This actually commands the motors to turn make the turn
     int16_t offset = globalOffset;
     if (mouse.direction == LEFT)
-        offset += 180;
+        offset -= 0;
     else if (mouse.direction == UP)
-        offset += 90;
+        offset -= 90;
     else if (mouse.direction == RIGHT)
-        offset += 0;
+        offset -= 180;
     else if (mouse.direction == DOWN)
-        offset += 270;
+        offset -= 270;
 
 
     // INTERMISSION
@@ -187,9 +187,9 @@ void turn(int8_t direction) {
     int16_t target;
 
     if (direction == TURN_RIGHT)
-        target = 270;
-    else if (direction == TURN_LEFT)
         target = 90;
+    else if (direction == TURN_LEFT)
+        target = 270;
     else if (direction == TURN_AROUND) {
         target = 270;
         offset += 90;
