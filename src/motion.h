@@ -88,60 +88,6 @@ void rotate(int32_t speed) {
     if (motorL.speed < 0) motorL.speed *= TURN_TRIM;
 }
 
-// NEEDS HARDWARE INTERFACE
-// Moves the mouse forward a given number of cells
-void forward(uint8_t number) {
-    for (uint8_t i = 0; i < number; i++) {
-        // Update the mouse's virtual position
-        switch (mouse.direction) {
-            case RIGHT:
-                mouse.pos.x++;
-                break;
-            case UP:
-                mouse.pos.y--;
-                break;
-            case LEFT:
-                mouse.pos.x--;
-                break;
-            case DOWN:
-                mouse.pos.y++;
-                break;
-        }
-    }
-
-    int32_t encoderOffsetL = motorL.getCount();
-    int32_t encoderOffsetR = motorR.getCount();
-    int16_t target =
-        number * MAZE_CELL_SIZE * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
-    uint32_t start = millis();
-    while (millis() - start < 2500) {
-        // Motor L
-        LinearLSetpoint = target * FORWARD_TURN_TRIM;
-        LinearLSetpoint /= 5000;
-
-        LinearLInput = motorL.getCount() - encoderOffsetL;
-        LinearLInput /= 5000;
-
-        LinearLPID.Compute();
-
-        motorL.speed = LinearLOutput;
-
-        // MotorR
-        LinearRSetpoint = target;
-        LinearRSetpoint /= 5000;
-
-        LinearRInput = motorR.getCount() - encoderOffsetR;
-        LinearRInput /= 5000;
-
-        LinearRPID.Compute();
-
-        motorR.speed = LinearROutput;
-
-        motorR.PWMRun();
-        motorL.PWMRun();
-    }
-}
-
 void maintainAngle(int16_t target, int16_t offset = 0) {
     RotationalSetpoint = target;
     RotationalSetpoint /= 360.0;
@@ -169,7 +115,6 @@ void turn(int8_t direction) {
     else if (mouse.direction == DOWN)
         offset -= 270;
 
-
     // INTERMISSION
     // Updates virtual mouse's direction
     mouse.direction -= direction;
@@ -193,10 +138,67 @@ void turn(int8_t direction) {
     else if (direction == TURN_AROUND) {
         target = 270;
         offset += 90;
-    }
-    while (millis() - start < 2500) {
+    } else if (direction == TURN_MAINTAIN)
+        target = 180;
+    while (millis() - start < 1500) {
         maintainAngle(target, offset);
     }
+}
+
+void move(int16_t distance) {
+    int32_t encoderOffsetL = motorL.getCount();
+    int32_t encoderOffsetR = motorR.getCount();
+    int16_t target = distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
+    uint32_t start = millis();
+    while (millis() - start < 1250) {
+        // Motor L
+        LinearLSetpoint = target * FORWARD_TURN_TRIM;
+        LinearLSetpoint /= 5000;
+
+        LinearLInput = motorL.getCount() - encoderOffsetL;
+        LinearLInput /= 5000;
+
+        LinearLPID.Compute();
+
+        motorL.speed = LinearLOutput;
+
+        // MotorR
+        LinearRSetpoint = target;
+        LinearRSetpoint /= 5000;
+
+        LinearRInput = motorR.getCount() - encoderOffsetR;
+        LinearRInput /= 5000;
+
+        LinearRPID.Compute();
+
+        motorR.speed = LinearROutput;
+
+        motorR.PWMRun();
+        motorL.PWMRun();
+    }
+}
+
+// Moves the mouse forward a given number of cells
+void forward(uint8_t number) {
+    for (uint8_t i = 0; i < number; i++) {
+        // Update the mouse's virtual position
+        switch (mouse.direction) {
+            case RIGHT:
+                mouse.pos.x++;
+                break;
+            case UP:
+                mouse.pos.y--;
+                break;
+            case LEFT:
+                mouse.pos.x--;
+                break;
+            case DOWN:
+                mouse.pos.y++;
+                break;
+        }
+    }
+
+    move(number * MAZE_CELL_SIZE);
 }
 
 // This function takes a move as input, positions the mouse to make it, and then
@@ -219,6 +221,9 @@ void makeMove(uint8_t move, uint8_t number) {
                 case DOWN:
                     turn(TURN_LEFT);
                     break;
+                case RIGHT:
+                    turn(TURN_MAINTAIN);
+                    break;
             }
             break;
         case UP:
@@ -231,6 +236,9 @@ void makeMove(uint8_t move, uint8_t number) {
                     break;
                 case DOWN:
                     turn(TURN_AROUND);
+                    break;
+                case UP:
+                    turn(TURN_MAINTAIN);
                     break;
             }
             break;
@@ -245,6 +253,9 @@ void makeMove(uint8_t move, uint8_t number) {
                 case DOWN:
                     turn(TURN_RIGHT);
                     break;
+                case LEFT:
+                    turn(TURN_MAINTAIN);
+                    break;
             }
             break;
         case DOWN:
@@ -258,9 +269,30 @@ void makeMove(uint8_t move, uint8_t number) {
                 case LEFT:
                     turn(TURN_LEFT);
                     break;
+                case DOWN:
+                    turn(TURN_MAINTAIN);
+                    break;
             }
             break;
     }
     // goes forward
     forward(number);
+}
+
+void autoCenter() {
+    turn(TURN_MAINTAIN);
+    uint16_t Left = ToF_Left.getDistance() - 17;
+    uint16_t Front = ToF_Front.getDistance() - 29;
+    uint16_t Right = ToF_Right.getDistance() - 22;
+
+    turn(TURN_RIGHT);
+    uint16_t Back = ToF_Right.getDistance() - 22;
+
+    move(Right - Left);
+
+    turn(TURN_LEFT);
+
+    move(Front - Back);
+
+    turn(TURN_MAINTAIN);
 }

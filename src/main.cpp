@@ -19,7 +19,7 @@
 #define START_X 0
 #define START_DIRECTION RIGHT
 #define GOAL_Y 1
-#define GOAL_X 1
+#define GOAL_X 0
 
 void setup() {
     Serial.begin(19200);
@@ -147,15 +147,15 @@ void loop() {
 
     navigate(goalPos);
 
-    // // buttonCheckpoint();
+    // autoCenter();
 
-    // // navigate(startPos);
+    // buttonCheckpoint();
 
-    // // buttonCheckpoint();
+    // navigate(startPos);
 
-    // // sprint(goalPos);
+    // buttonCheckpoint();
 
-    setColor(GREEN);
+    // sprint(goalPos);
 
     while (1) {
         delay(1);

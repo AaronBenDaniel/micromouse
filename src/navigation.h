@@ -210,6 +210,7 @@ void navigate(struct xyPair_t destination) {
         measure();
     }
     Serial.println("Done!");
+    setColor(GREEN);
 }
 
 void sprint(struct xyPair_t goal) {

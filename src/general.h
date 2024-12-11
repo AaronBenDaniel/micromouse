@@ -10,7 +10,8 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define TURN_RIGHT 1
 #define TURN_LEFT -1
 #define TURN_AROUND 2
-#define MAX_MAZE_SIZE 13
+#define TURN_MAINTAIN 0
+#define MAX_MAZE_SIZE 4
 #define MAX_DISTANCE 255
 #define MAZE_CELL_SIZE 90
 
@@ -43,31 +44,31 @@ struct matrix_t {
     uint8_t matrix[MAX_MAZE_SIZE][MAX_MAZE_SIZE];
 };
 
-// This maze is only used for development purposes
-// The mouse will never access this maze during operation
-struct matrix_t maze;
-void initVirtualMaze() {  // Call this function before anything else to load the
-                          // hardcoded Serial maze into the maze struct
-    uint8_t mazeArray[MAX_MAZE_SIZE][MAX_MAZE_SIZE] = {
-        {3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2},
-        {2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2},
-        {2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2},
-        {2, 3, 1, 1, 1, 0, 1, 0, 2, 0, 0, 2, 2},
-        {2, 1, 1, 1, 1, 2, 3, 1, 0, 1, 2, 2, 2},
-        {3, 2, 1, 1, 1, 2, 3, 1, 1, 1, 2, 0, 2},
-        {2, 1, 1, 1, 0, 2, 0, 3, 1, 1, 2, 3, 2},
-        {2, 1, 1, 3, 2, 2, 1, 2, 3, 2, 2, 2, 2},
-        {2, 1, 2, 2, 2, 1, 1, 0, 2, 2, 2, 0, 2},
-        {3, 1, 0, 2, 2, 2, 1, 1, 0, 0, 3, 2, 2},
-        {3, 2, 3, 0, 2, 2, 2, 1, 1, 3, 2, 2, 2},
-        {2, 0, 1, 0, 2, 2, 1, 1, 1, 0, 2, 0, 2},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}};
-    for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
-        for (uint8_t x = 0; x < MAX_MAZE_SIZE; x++) {
-            maze.matrix[y][x] = mazeArray[y][x];
-        }
-    }
-}
+// // This maze is only used for development purposes
+// // The mouse will never access this maze during operation
+// struct matrix_t maze;
+// void initVirtualMaze() {  // Call this function before anything else to load the
+//                           // hardcoded Serial maze into the maze struct
+//     uint8_t mazeArray[MAX_MAZE_SIZE][MAX_MAZE_SIZE] = {
+//         {3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2},
+//         {2, 3, 3, 1, 1, 0, 0, 3, 1, 1, 2, 1, 2},
+//         {2, 0, 1, 1, 1, 1, 2, 2, 3, 2, 2, 2, 2},
+//         {2, 3, 1, 1, 1, 0, 1, 0, 2, 0, 0, 2, 2},
+//         {2, 1, 1, 1, 1, 2, 3, 1, 0, 1, 2, 2, 2},
+//         {3, 2, 1, 1, 1, 2, 3, 1, 1, 1, 2, 0, 2},
+//         {2, 1, 1, 1, 0, 2, 0, 3, 1, 1, 2, 3, 2},
+//         {2, 1, 1, 3, 2, 2, 1, 2, 3, 2, 2, 2, 2},
+//         {2, 1, 2, 2, 2, 1, 1, 0, 2, 2, 2, 0, 2},
+//         {3, 1, 0, 2, 2, 2, 1, 1, 0, 0, 3, 2, 2},
+//         {3, 2, 3, 0, 2, 2, 2, 1, 1, 3, 2, 2, 2},
+//         {2, 0, 1, 0, 2, 2, 1, 1, 1, 0, 2, 0, 2},
+//         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}};
+//     for (uint8_t y = 0; y < MAX_MAZE_SIZE; y++) {
+//         for (uint8_t x = 0; x < MAX_MAZE_SIZE; x++) {
+//             maze.matrix[y][x] = mazeArray[y][x];
+//         }
+//     }
+// }
 
 // Development function for printing a matrix in a human-readable manner
 void printMatrix(struct matrix_t matrix) {
