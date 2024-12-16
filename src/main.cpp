@@ -18,8 +18,8 @@
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 1
-#define GOAL_X 0
+#define GOAL_Y 3
+#define GOAL_X 3
 
 void setup() {
     Serial.begin(19200);
@@ -73,68 +73,6 @@ int16_t lastSpeed;
 float target = 0;
 
 void loop() {
-    // if (Serial.available()) {
-    //     int choice = 0;
-    //     char incomingByte;
-    //     while (1) {
-    //         if (Serial.available() > 0) {
-    //             incomingByte = Serial.read();
-    //             if (incomingByte < '0' || incomingByte > '9') break;
-    //             choice = choice * 10 + incomingByte - '0';
-    //         }
-    //     }
-    //     if (incomingByte == 'p') {
-    //         LinearKp = choice;
-    //         LinearPID.SetTunings(choice, LinearKi, LinearKd);
-    //     } else if (incomingByte == 'i') {
-    //         LinearKi = choice;
-    //         LinearPID.SetTunings(LinearKp, choice, LinearKd);
-    //     } else if (incomingByte == 'd') {
-    //         LinearKd = choice;
-    //         LinearPID.SetTunings(LinearKp, LinearKi, choice);
-    //     } else
-    //         for (int i = 0; i < 1000; i++) Serial.println("WHAT!");
-    // }
-    // Serial.print("Kp: ");
-    // Serial.print(LinearKp);
-    // Serial.print(" Ki: ");
-    // Serial.print(LinearKi);
-    // Serial.print(" Kd: ");
-    // Serial.print(LinearKd);
-    // Serial.print("\n");
-
-    // Serial.print("Left: ");
-    // Serial.print(ToF_Left.detectWall());
-    // Serial.print(" Front: ");
-    // Serial.print(ToF_Front.detectWall());
-    // Serial.print(" Right: ");
-    // Serial.print(ToF_Right.detectWall());
-    // Serial.print("\n");
-
-    // for (uint8_t i = 0; i < 4; i++) {
-    //     forward(1);
-    //     turn(TURN_RIGHT);
-    // }
-
-    // if (millis() - lastUpdate > 1000) {
-    // turn(TURN_RIGHT);
-    // turn(TURN_LEFT);
-    // turn(TURN_LEFT);
-    // turn(TURN_AROUND);
-    // delay(1000);
-    //     lastUpdate = millis();
-    // }
-    // delay(100);
-
-    // setColor(GREEN);
-    // turn(TURN_RIGHT);
-    // turn(TURN_LEFT);
-    // setColor(BLUE);
-    // turn(TURN_LEFT);
-    // turn(TURN_RIGHT);
-
-    // buttonCheckpoint();
-
     struct xyPair_t goalPos;
     goalPos.y = GOAL_Y;
     goalPos.x = GOAL_X;
@@ -149,13 +87,13 @@ void loop() {
 
     // autoCenter();
 
-    // buttonCheckpoint();
+    buttonCheckpoint();
 
-    // navigate(startPos);
+    navigate(startPos);
 
-    // buttonCheckpoint();
+    buttonCheckpoint();
 
-    // sprint(goalPos);
+    sprint(goalPos);
 
     while (1) {
         delay(1);

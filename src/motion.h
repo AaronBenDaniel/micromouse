@@ -81,6 +81,11 @@ class motor_t {
 motor_t motorR(MOTOR_RIGHT_A, MOTOR_RIGHT_B, ENCODER_RIGHT_A, ENCODER_RIGHT_B);
 motor_t motorL(MOTOR_LEFT_A, MOTOR_LEFT_B, ENCODER_LEFT_A, ENCODER_LEFT_B);
 
+void allStop() {
+    motorL.stop();
+    motorR.stop();
+}
+
 void rotate(int32_t speed) {
     motorR.speed = -1 * speed;
     motorL.speed = speed;
@@ -146,36 +151,59 @@ void turn(int8_t direction) {
 }
 
 void move(int16_t distance) {
+    // int32_t encoderOffsetL = motorL.getCount();
+    // int32_t encoderOffsetR = motorR.getCount();
+    // int16_t target = distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
+    // uint32_t start = millis();
+    // while (millis() - start < 1250) {
+    //     // Motor L
+    //     LinearLSetpoint = target * FORWARD_TURN_TRIM;
+    //     LinearLSetpoint /= 5000;
+
+    //     LinearLInput = motorL.getCount() - encoderOffsetL;
+    //     LinearLInput /= 5000;
+
+    //     LinearLPID.Compute();
+
+    //     motorL.speed = LinearLOutput;
+
+    //     // MotorR
+    //     LinearRSetpoint = target;
+    //     LinearRSetpoint /= 5000;
+
+    //     LinearRInput = motorR.getCount() - encoderOffsetR;
+    //     LinearRInput /= 5000;
+
+    //     LinearRPID.Compute();
+
+    //     motorR.speed = LinearROutput;
+
+    //     motorR.PWMRun();
+    //     motorL.PWMRun();
+    // }
+    const uint16_t offset = 210;
     int32_t encoderOffsetL = motorL.getCount();
-    int32_t encoderOffsetR = motorR.getCount();
-    int16_t target = distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
-    uint32_t start = millis();
-    while (millis() - start < 1250) {
-        // Motor L
-        LinearLSetpoint = target * FORWARD_TURN_TRIM;
-        LinearLSetpoint /= 5000;
-
-        LinearLInput = motorL.getCount() - encoderOffsetL;
-        LinearLInput /= 5000;
-
-        LinearLPID.Compute();
-
-        motorL.speed = LinearLOutput;
-
-        // MotorR
-        LinearRSetpoint = target;
-        LinearRSetpoint /= 5000;
-
-        LinearRInput = motorR.getCount() - encoderOffsetR;
-        LinearRInput /= 5000;
-
-        LinearRPID.Compute();
-
-        motorR.speed = LinearROutput;
-
-        motorR.PWMRun();
-        motorL.PWMRun();
+    if (distance > 0) {
+        motorL.speed = 128;
+        motorR.speed = 128;
+        while (motorL.getCount() - encoderOffsetL + offset <
+               distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+            motorL.PWMRun();
+            motorR.PWMRun();
+        }
+    } else {
+        motorL.speed = -128;
+        motorR.speed = -128;
+        while (motorL.getCount() - encoderOffsetL - offset >
+               distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+            motorL.PWMRun();
+            motorR.PWMRun();
+        }
     }
+    motorR.forward();
+    delay(5);
+    motorR.stop();
+    delay(500);
 }
 
 // Moves the mouse forward a given number of cells
@@ -221,9 +249,6 @@ void makeMove(uint8_t move, uint8_t number) {
                 case DOWN:
                     turn(TURN_LEFT);
                     break;
-                case RIGHT:
-                    turn(TURN_MAINTAIN);
-                    break;
             }
             break;
         case UP:
@@ -236,9 +261,6 @@ void makeMove(uint8_t move, uint8_t number) {
                     break;
                 case DOWN:
                     turn(TURN_AROUND);
-                    break;
-                case UP:
-                    turn(TURN_MAINTAIN);
                     break;
             }
             break;
@@ -253,9 +275,6 @@ void makeMove(uint8_t move, uint8_t number) {
                 case DOWN:
                     turn(TURN_RIGHT);
                     break;
-                case LEFT:
-                    turn(TURN_MAINTAIN);
-                    break;
             }
             break;
         case DOWN:
@@ -269,14 +288,12 @@ void makeMove(uint8_t move, uint8_t number) {
                 case LEFT:
                     turn(TURN_LEFT);
                     break;
-                case DOWN:
-                    turn(TURN_MAINTAIN);
-                    break;
             }
             break;
     }
     // goes forward
     forward(number);
+    turn(TURN_MAINTAIN);
 }
 
 void autoCenter() {

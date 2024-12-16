@@ -23,7 +23,7 @@ class ToF_t {
             return (9999);
     }
 
-    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE/2); }
+    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE / 2); }
 
    private:
     uint8_t id;

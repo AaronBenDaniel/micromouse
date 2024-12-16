@@ -192,7 +192,6 @@ void navigate(struct xyPair_t destination) {
     measure();
     turn(TURN_RIGHT);
     measure();
-    turn(TURN_LEFT);  // THIS CAN BE REMOVED ONCE THE SPRINT BUG IS FIXED
     uint8_t move = 0;
     // while loop continuously to calculate the best next move, makes it, and
     // then measure its surroundings
@@ -211,6 +210,7 @@ void navigate(struct xyPair_t destination) {
     }
     Serial.println("Done!");
     setColor(GREEN);
+    allStop();
 }
 
 void sprint(struct xyPair_t goal) {
@@ -291,5 +291,6 @@ void sprint(struct xyPair_t goal) {
         // reset move counter
         moveCounter = 1;
     }
+    allStop();
     Serial.println("Done!");
 }

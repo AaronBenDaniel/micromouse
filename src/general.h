@@ -11,7 +11,7 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define TURN_LEFT -1
 #define TURN_AROUND 2
 #define TURN_MAINTAIN 0
-#define MAX_MAZE_SIZE 4
+#define MAX_MAZE_SIZE 5
 #define MAX_DISTANCE 255
 #define MAZE_CELL_SIZE 90
 
@@ -47,7 +47,8 @@ struct matrix_t {
 // // This maze is only used for development purposes
 // // The mouse will never access this maze during operation
 // struct matrix_t maze;
-// void initVirtualMaze() {  // Call this function before anything else to load the
+// void initVirtualMaze() {  // Call this function before anything else to load
+// the
 //                           // hardcoded Serial maze into the maze struct
 //     uint8_t mazeArray[MAX_MAZE_SIZE][MAX_MAZE_SIZE] = {
 //         {3, 1, 1, 1, 1, 3, 3, 1, 1, 1, 1, 1, 2},
@@ -194,6 +195,8 @@ int16_t getInput() {
 }
 
 void failure(uint8_t code) {
+    void allStop();
+    allStop();
     Serial.print("ERROR CODE: ");
     Serial.println(code);
     while (1) {
