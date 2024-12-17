@@ -87,7 +87,7 @@ void allStop() {
 }
 
 void rotate(int32_t speed) {
-    motorR.speed = -1 * speed;
+    motorR.speed = -1 * speed * 1.1;
     motorL.speed = speed;
     if (motorR.speed < 0) motorR.speed *= TURN_TRIM;
     if (motorL.speed < 0) motorL.speed *= TURN_TRIM;
@@ -181,28 +181,33 @@ void move(int16_t distance) {
     //     motorR.PWMRun();
     //     motorL.PWMRun();
     // }
-    const uint16_t offset = 210;
+    const uint16_t offset = 200;
+    int16_t rotationOffset = getAngle() + 180;
     int32_t encoderOffsetL = motorL.getCount();
     if (distance > 0) {
-        motorL.speed = 128;
-        motorR.speed = 128;
         while (motorL.getCount() - encoderOffsetL + offset <
                distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+            int16_t correction = 10 * (getAngle(rotationOffset) - 180);
+            motorL.speed = (255 + correction);
+            motorR.speed = (255 - correction);
+
             motorL.PWMRun();
             motorR.PWMRun();
         }
     } else {
-        motorL.speed = -128;
-        motorR.speed = -128;
         while (motorL.getCount() - encoderOffsetL - offset >
                distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+            int16_t correction = 10 * getAngle(rotationOffset) - 180;
+            motorL.speed = -100 - correction;
+            motorR.speed = -110 + correction;
+
             motorL.PWMRun();
             motorR.PWMRun();
         }
     }
-    motorR.forward();
-    delay(5);
-    motorR.stop();
+    // motorR.forward();
+    // delay(5);
+    // motorR.stop();
     delay(500);
 }
 

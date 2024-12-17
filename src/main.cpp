@@ -81,21 +81,19 @@ void loop() {
     startPos.y = START_Y;
     startPos.x = START_X;
 
-    buttonCheckpoint();
+    // buttonCheckpoint();
 
-    navigate(goalPos);
+    // navigate(goalPos);
 
-    // autoCenter();
+    // buttonCheckpoint();
 
-    buttonCheckpoint();
+    // navigate(startPos);
 
-    navigate(startPos);
+    // buttonCheckpoint();
 
-    buttonCheckpoint();
-
-    sprint(goalPos);
+    // sprint(goalPos);
 
     while (1) {
-        delay(1);
+        maintainAngle(180);
     }
 }

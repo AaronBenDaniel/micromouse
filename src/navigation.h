@@ -292,5 +292,6 @@ void sprint(struct xyPair_t goal) {
         moveCounter = 1;
     }
     allStop();
+    setColor(GREEN);
     Serial.println("Done!");
 }
