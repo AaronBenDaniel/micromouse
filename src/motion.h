@@ -12,8 +12,7 @@
 #define MOTOR_RIGHT_B 36
 
 const float ENCODER_TRIM_VALUE = 19 / 18.4;
-const float TURN_TRIM = 1.1;
-const float FORWARD_TURN_TRIM = 1;
+const float TURN_TRIM = 1.2;
 
 class motor_t {
    public:
@@ -87,10 +86,12 @@ void allStop() {
 }
 
 void rotate(int32_t speed) {
-    motorR.speed = -1 * speed * 1.1;
+    motorR.speed = -1 * speed * 1.15;
     motorL.speed = speed;
     if (motorR.speed < 0) motorR.speed *= TURN_TRIM;
     if (motorL.speed < 0) motorL.speed *= TURN_TRIM;
+    // motorR.speed = -1 * speed;
+    // motorL.speed = speed;
 }
 
 void maintainAngle(int16_t target, int16_t offset = 0) {
@@ -151,37 +152,7 @@ void turn(int8_t direction) {
 }
 
 void move(int16_t distance) {
-    // int32_t encoderOffsetL = motorL.getCount();
-    // int32_t encoderOffsetR = motorR.getCount();
-    // int16_t target = distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE;
-    // uint32_t start = millis();
-    // while (millis() - start < 1250) {
-    //     // Motor L
-    //     LinearLSetpoint = target * FORWARD_TURN_TRIM;
-    //     LinearLSetpoint /= 5000;
-
-    //     LinearLInput = motorL.getCount() - encoderOffsetL;
-    //     LinearLInput /= 5000;
-
-    //     LinearLPID.Compute();
-
-    //     motorL.speed = LinearLOutput;
-
-    //     // MotorR
-    //     LinearRSetpoint = target;
-    //     LinearRSetpoint /= 5000;
-
-    //     LinearRInput = motorR.getCount() - encoderOffsetR;
-    //     LinearRInput /= 5000;
-
-    //     LinearRPID.Compute();
-
-    //     motorR.speed = LinearROutput;
-
-    //     motorR.PWMRun();
-    //     motorL.PWMRun();
-    // }
-    const uint16_t offset = 200;
+    const uint16_t offset = 190;
     int16_t rotationOffset = getAngle() + 180;
     int32_t encoderOffsetL = motorL.getCount();
     if (distance > 0) {
@@ -195,19 +166,8 @@ void move(int16_t distance) {
             motorR.PWMRun();
         }
     } else {
-        while (motorL.getCount() - encoderOffsetL - offset >
-               distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
-            int16_t correction = 10 * getAngle(rotationOffset) - 180;
-            motorL.speed = -100 - correction;
-            motorR.speed = -110 + correction;
-
-            motorL.PWMRun();
-            motorR.PWMRun();
-        }
+        failure(4);
     }
-    // motorR.forward();
-    // delay(5);
-    // motorR.stop();
     delay(500);
 }
 
@@ -298,23 +258,5 @@ void makeMove(uint8_t move, uint8_t number) {
     }
     // goes forward
     forward(number);
-    turn(TURN_MAINTAIN);
-}
-
-void autoCenter() {
-    turn(TURN_MAINTAIN);
-    uint16_t Left = ToF_Left.getDistance() - 17;
-    uint16_t Front = ToF_Front.getDistance() - 29;
-    uint16_t Right = ToF_Right.getDistance() - 22;
-
-    turn(TURN_RIGHT);
-    uint16_t Back = ToF_Right.getDistance() - 22;
-
-    move(Right - Left);
-
-    turn(TURN_LEFT);
-
-    move(Front - Back);
-
     turn(TURN_MAINTAIN);
 }

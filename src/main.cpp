@@ -18,8 +18,8 @@
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 3
-#define GOAL_X 3
+#define GOAL_Y 4
+#define GOAL_X 4
 
 void setup() {
     Serial.begin(19200);
@@ -37,12 +37,6 @@ void setup() {
     RotationalPID.SetMode(AUTOMATIC);
     RotationalPID.SetOutputLimits(-255, 255);
     RotationalPID.SetSampleTime(10);
-    LinearLPID.SetMode(AUTOMATIC);
-    LinearLPID.SetOutputLimits(-255, 255);
-    LinearLPID.SetSampleTime(10);
-    LinearRPID.SetMode(AUTOMATIC);
-    LinearRPID.SetOutputLimits(-255, 255);
-    LinearRPID.SetSampleTime(10);
 
     // initVirtualMaze();  // FOR DEVELOPMENT PURPOSES ONLY
 
@@ -81,19 +75,19 @@ void loop() {
     startPos.y = START_Y;
     startPos.x = START_X;
 
-    // buttonCheckpoint();
+    buttonCheckpoint();
 
-    // navigate(goalPos);
+    navigate(goalPos);
 
-    // buttonCheckpoint();
+    buttonCheckpoint();
 
-    // navigate(startPos);
+    navigate(startPos);
 
-    // buttonCheckpoint();
+    buttonCheckpoint();
 
-    // sprint(goalPos);
+    sprint(goalPos);
 
     while (1) {
-        maintainAngle(180);
+        delay(1);
     }
 }

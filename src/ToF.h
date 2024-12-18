@@ -2,7 +2,10 @@
 
 class ToF_t {
    public:
-    ToF_t(uint8_t initId) { id = initId; }
+    ToF_t(uint8_t initId, uint8_t initOffset) {
+        id = initId;
+        offset = initOffset;
+    }
 
     void init() {
         tcaselect(id);
@@ -18,16 +21,17 @@ class ToF_t {
         tcaselect(id);
         sensor.rangingTest(&measure, false);
         if (measure.RangeStatus != 4)
-            return (measure.RangeMilliMeter);
+            return (measure.RangeMilliMeter + offset);
         else
             return (9999);
     }
 
-    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE / 2); }
+    bool detectWall() { return (getDistance() < MAZE_CELL_SIZE); }
 
    private:
     uint8_t id;
     Adafruit_VL53L0X sensor;
+    uint8_t offset;
 
     void tcaselect(uint8_t i) {
         if (i > 7) return;
@@ -38,9 +42,9 @@ class ToF_t {
     }
 };
 
-ToF_t ToF_Front(0);
-ToF_t ToF_Right(1);
-ToF_t ToF_Left(2);
+ToF_t ToF_Front(0, 29);
+ToF_t ToF_Right(1, 22);
+ToF_t ToF_Left(2, 17);
 
 void addWall(uint8_t direction) {
     while (direction > 3) direction -= 4;
@@ -76,35 +80,8 @@ void addWall(uint8_t direction) {
     }
 }
 
+// Check what's visible to the mouse and store it into memory
 void measure() {
-    // // Check what's visible to the mouse and store it into memory
-    // // Is there a wall above or to the left of the mouse
-    // memory.matrix[mouse.pos.y][mouse.pos.x] =
-    //     maze.matrix[mouse.pos.y][mouse.pos.x];
-    // // Is there a wall below the mouse
-    // if (maze.matrix[mouse.pos.y + 1][mouse.pos.x] == 1 ||
-    //     maze.matrix[mouse.pos.y + 1][mouse.pos.x] == 3) {
-    //     // store the presence of a wall into memory
-    //     if (memory.matrix[mouse.pos.y + 1][mouse.pos.x] != 3) {
-    //         if (memory.matrix[mouse.pos.y + 1][mouse.pos.x] == 2) {
-    //             memory.matrix[mouse.pos.y + 1][mouse.pos.x] = 3;
-    //         } else {
-    //             memory.matrix[mouse.pos.y + 1][mouse.pos.x] = 1;
-    //         }
-    //     }
-    // }
-    // // Is there a wall to the right of the mouse
-    // if (maze.matrix[mouse.pos.y][mouse.pos.x + 1] == 2 ||
-    //     maze.matrix[mouse.pos.y][mouse.pos.x + 1] == 3) {
-    //     // store the presence of a wall into memory
-    //     if (memory.matrix[mouse.pos.y][mouse.pos.x + 1] != 3) {
-    //         if (memory.matrix[mouse.pos.y][mouse.pos.x + 1] == 1) {
-    //             memory.matrix[mouse.pos.y][mouse.pos.x + 1] = 3;
-    //         } else {
-    //             memory.matrix[mouse.pos.y][mouse.pos.x + 1] = 2;
-    //         }
-    //     }
-    // }
     if (ToF_Left.detectWall()) addWall(mouse.direction + 1);
     if (ToF_Front.detectWall()) addWall(mouse.direction);
     if (ToF_Right.detectWall()) addWall(mouse.direction - 1);
