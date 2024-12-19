@@ -14,16 +14,13 @@ class ToF_t {
             Serial.println(id);
             failure(2);
         }
+        sensor.startRangeContinuous();
     }
 
     uint16_t getDistance() {
-        VL53L0X_RangingMeasurementData_t measure;
         tcaselect(id);
-        sensor.rangingTest(&measure, false);
-        if (measure.RangeStatus != 4)
-            return (measure.RangeMilliMeter + offset);
-        else
-            return (9999);
+        if (sensor.isRangeComplete()) distance = sensor.readRange();
+        return (distance);
     }
 
     bool detectWall() { return (getDistance() < MAZE_CELL_SIZE); }
@@ -32,6 +29,7 @@ class ToF_t {
     uint8_t id;
     Adafruit_VL53L0X sensor;
     uint8_t offset;
+    uint16_t distance;
 
     void tcaselect(uint8_t i) {
         if (i > 7) return;
