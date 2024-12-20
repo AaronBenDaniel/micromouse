@@ -20,7 +20,7 @@ class ToF_t {
     uint16_t getDistance() {
         tcaselect(id);
         if (sensor.isRangeComplete()) distance = sensor.readRange();
-        return (distance);
+        return (distance + offset);
     }
 
     bool detectWall() { return (getDistance() < MAZE_CELL_SIZE); }

@@ -156,8 +156,9 @@ void move(int16_t distance) {
     int16_t rotationOffset = getAngle() + 180;
     int32_t encoderOffsetL = motorL.getCount();
     if (distance > 0) {
-        while (motorL.getCount() - encoderOffsetL + offset <
-               distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+        // while (motorL.getCount() - encoderOffsetL + offset <
+        //        distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
+        while(1){
             int16_t target;
             int16_t LeftDist = ToF_Left.getDistance();
             int16_t RightDist = ToF_Right.getDistance();
@@ -180,6 +181,8 @@ void move(int16_t distance) {
             int16_t correction = 10 * (getAngle(rotationOffset) - target);
             motorL.speed = (255 + correction);
             motorR.speed = (255 - correction);
+
+            Serial.println(target);
 
             motorL.PWMRun();
             motorR.PWMRun();
