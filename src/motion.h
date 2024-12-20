@@ -162,11 +162,20 @@ void move(int16_t distance) {
             int16_t LeftDist = ToF_Left.getDistance();
             int16_t RightDist = ToF_Right.getDistance();
 
-            if (LeftDist < MAZE_CELL_SIZE / 2 && RightDist < MAZE_CELL_SIZE / 2)
-                target = (LeftDist < RightDist) ? 178 : 182;
+            // \/             \/
 
-            // INCOMPLETE CODE
-            //  CONTINUE WRITING DECISION TREE FOR AUTO WALL CENTERING
+            if (LeftDist < MAZE_CELL_SIZE) {
+                if (RightDist < MAZE_CELL_SIZE)
+                    target = (LeftDist < RightDist) ? 178 : 182;
+                else
+                    target = (LeftDist < MAZE_CELL_SIZE / 2) ? 178 : 182;
+            } else {
+                if (RightDist < MAZE_CELL_SIZE)
+                    target = (RightDist < MAZE_CELL_SIZE / 2) ? 182 : 178;
+                else
+                    target = 180;
+            }
+            // /\ UNTESTED CODE /\
 
             int16_t correction = 10 * (getAngle(rotationOffset) - target);
             motorL.speed = (255 + correction);
