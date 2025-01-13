@@ -11,12 +11,12 @@ Adafruit_NeoPixel pixel(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 #define TURN_LEFT -1
 #define TURN_AROUND 2
 #define TURN_MAINTAIN 0
-#define MAX_MAZE_SIZE 6
+#define MAX_MAZE_SIZE 5
 #define MAX_DISTANCE 255
-#define MAZE_CELL_SIZE 90
+#define MAZE_CELL_SIZE 180
 
 // Neopixel color consts
-const uint8_t GREEN = 0, BLUE = 1, YELLOW = 2, RED = 3, OFF = 4;
+const uint8_t GREEN = 0, BLUE = 1, YELLOW = 2, RED = 3, OFF = 4, PURPLE = 5;
 
 // .......look this is either genius or stupid
 uint8_t bias[4][4] = {{RIGHT, DOWN, UP, LEFT},
@@ -152,6 +152,9 @@ void setColor(uint8_t color) {
         case OFF:
             pixel.setPixelColor(0, 0, 0, 0);
             break;
+        case PURPLE:
+            pixel.setPixelColor(0, 255, 0, 255);
+            break;
     }
     pixel.show();
 }
@@ -211,6 +214,7 @@ void failure(uint8_t code) {
 }
 
 // Global structs that need to be accessed by multiple functions
+// struct matrix_t memory;
 struct matrix_t memory;
 
 struct mouse_t mouse;

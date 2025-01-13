@@ -11,8 +11,12 @@
 #define MOTOR_RIGHT_A 16
 #define MOTOR_RIGHT_B 36
 
+#define CORRECTION_LOW 178
+#define CORRECTION_HIGH 182
+
 const float ENCODER_TRIM_VALUE = 19 / 18.4;
-const float TURN_TRIM = 1.2;
+const float BACK_TURN_TRIM = 1.2;
+const float RIGHT_TURN_TRIM = 1.15;
 
 class motor_t {
    public:
@@ -25,10 +29,9 @@ class motor_t {
         motorB = motorb;
         encoder.attachFullQuad(encoderA, encoderB);
         encoder.setCount(0);
-        pinMode(motorA, OUTPUT);
-        pinMode(motorB, OUTPUT);
-        digitalWrite(motorA, LOW);
-        digitalWrite(motorB, LOW);
+        ledcAttach(motorA, 1000, 8);
+        ledcAttach(motorB, 1000, 8);
+        stop();
     }
 
     float getDistance() {
@@ -38,38 +41,28 @@ class motor_t {
 
     int32_t getCount() { return (encoder.getCount()); }
 
-    void forward() {
-        digitalWrite(motorA, LOW);
-        digitalWrite(motorB, HIGH);
+    void forward(uint8_t amount = 255) {
+        ledcWrite(motorA, 0);
+        ledcWrite(motorB, amount);
     }
-    void back() {
-        digitalWrite(motorA, HIGH);
-        digitalWrite(motorB, LOW);
+    void back(uint8_t amount = 255) {
+        ledcWrite(motorA, amount);
+        ledcWrite(motorB, 0);
     }
     void stop() {
-        digitalWrite(motorA, LOW);
-        digitalWrite(motorB, LOW);
+        ledcWrite(motorA, 0);
+        ledcWrite(motorB, 0);
     }
 
-    void PWMRun() {
-        uint16_t onTime;
+    void writeSpeed(int32_t amount) {
+        speed = amount;
         if (speed < 0) {
-            if (speed < -255)
-                onTime = 1000;
-            else
-                onTime = map(speed * -1, 0, 255, 0, 1000);
-            back();
+            if (speed < -255) speed = -255;
+            back(speed * -1);
         } else {
-            if (speed > 255)
-                onTime = 1000;
-            else
-                onTime = map(speed, 0, 255, 0, 1000);
-            forward();
+            if (speed > 255) speed = 255;
+            forward(speed);
         }
-        uint16_t offTime = 1000 - onTime;
-        delayMicroseconds(onTime);
-        stop();
-        delayMicroseconds(offTime);
     }
 
    private:
@@ -86,27 +79,26 @@ void allStop() {
 }
 
 void rotate(int32_t speed) {
-    motorR.speed = -1 * speed * 1.15;
-    motorL.speed = speed;
-    if (motorR.speed < 0) motorR.speed *= TURN_TRIM;
-    if (motorL.speed < 0) motorL.speed *= TURN_TRIM;
-    // motorR.speed = -1 * speed;
-    // motorL.speed = speed;
+    if (speed > 0)
+        motorR.writeSpeed(-1 * speed * RIGHT_TURN_TRIM * BACK_TURN_TRIM);
+    else
+        motorR.writeSpeed(-1 * speed * RIGHT_TURN_TRIM);
+    if (speed < 0)
+        motorL.writeSpeed(speed * BACK_TURN_TRIM);
+    else
+        motorL.writeSpeed(speed);
 }
 
 void maintainAngle(int16_t target, int16_t offset = 0) {
     RotationalSetpoint = target;
-    RotationalSetpoint /= 360.0;
+    RotationalSetpoint /= 360;
 
     RotationalInput = getAngle(offset);
     RotationalInput /= 360;
 
     RotationalPID.Compute();
 
-    rotate(RotationalOutput);
-
-    motorR.PWMRun();
-    motorL.PWMRun();
+    rotate(RotationalOutput / 4);
 }
 
 void turn(int8_t direction) {
@@ -152,44 +144,68 @@ void turn(int8_t direction) {
 }
 
 void move(int16_t distance) {
-    const uint16_t offset = 190;
+    const uint8_t tolerance = 5;
+    const uint8_t target = MAZE_CELL_SIZE * 5 / 8;
+
+    const uint16_t offset = 280;
     int16_t rotationOffset = getAngle() + 180;
     int32_t encoderOffsetL = motorL.getCount();
+    int16_t LeftDist[3];
+    int16_t RightDist[3];
     if (distance > 0) {
-        // while (motorL.getCount() - encoderOffsetL + offset <
-        //        distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
-        while(1){
+        while (motorL.getCount() - encoderOffsetL + offset <
+               distance * GEAR_RATIO * ENCODER_RATIO / CIRCUMFERENCE) {
             int16_t target;
-            int16_t LeftDist = ToF_Left.getDistance();
-            int16_t RightDist = ToF_Right.getDistance();
+            LeftDist[0] = ToF_Left.getDistance();
+            RightDist[0] = ToF_Right.getDistance();
 
-            // \/             \/
+            LeftDist[2] = LeftDist[0];
+            RightDist[2] = RightDist[0];
 
-            if (LeftDist < MAZE_CELL_SIZE) {
-                if (RightDist < MAZE_CELL_SIZE)
-                    target = (LeftDist < RightDist) ? 178 : 182;
-                else
-                    target = (LeftDist < MAZE_CELL_SIZE / 2) ? 178 : 182;
-            } else {
-                if (RightDist < MAZE_CELL_SIZE)
-                    target = (RightDist < MAZE_CELL_SIZE / 2) ? 182 : 178;
-                else
-                    target = 180;
-            }
-            // /\ UNTESTED CODE /\
+            if (abs(LeftDist[0] - LeftDist[1]) < 6 ||
+                abs(LeftDist[0] - LeftDist[2]) < 6)
+                LeftDist[1] = LeftDist[0];
+            else
+                LeftDist[0] = LeftDist[1];
+
+            if (abs(RightDist[0] - RightDist[1]) < 6 ||
+                abs(RightDist[0] - RightDist[2]) < 6)
+                RightDist[1] = RightDist[0];
+            else
+                RightDist[0] = RightDist[1];
+
+            target = 180 + (LeftDist[0] - RightDist[0]);
+
+            if (target > CORRECTION_HIGH)
+                target = CORRECTION_HIGH;
+            else if (target < CORRECTION_LOW)
+                target = CORRECTION_LOW;
 
             int16_t correction = 10 * (getAngle(rotationOffset) - target);
-            motorL.speed = (255 + correction);
-            motorR.speed = (255 - correction);
+            motorL.writeSpeed(128 + correction);
+            motorR.writeSpeed(128 - correction);
 
-            Serial.println(target);
+            Serial.print("Left: ");
+            Serial.print(LeftDist[0]);
+            Serial.print(" Right: ");
+            Serial.print(RightDist[0]);
+            Serial.print(" Difference: ");
+            int16_t diff = LeftDist[0] - RightDist[0];
+            Serial.print((diff<0)?'-':'+');
+            if (abs(diff) < 100) Serial.print('0');
+            if (abs(diff) < 10) Serial.print('0');
+            Serial.print(abs(diff));
+            Serial.print(" Correction: ");
+            Serial.print(correction);
 
-            motorL.PWMRun();
-            motorR.PWMRun();
+            Serial.print("\n");
         }
     } else {
         failure(4);
     }
+    motorL.stop();
+    delay(10);
+    motorR.stop();
     delay(500);
 }
 
@@ -216,8 +232,8 @@ void forward(uint8_t number) {
     move(number * MAZE_CELL_SIZE);
 }
 
-// This function takes a move as input, positions the mouse to make it, and then
-// makes the move
+// This function takes a move as input, positions the mouse to make it, and
+// then makes the move
 void makeMove(uint8_t move, uint8_t number) {
     // don't do anything if the move in NOMOVE
     if (move == NO_MOVE) {

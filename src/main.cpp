@@ -6,6 +6,7 @@
 #include <PID_v1.h>        // PID
 #include <Wire.h>          // ToF
 #include "Adafruit_VL53L0X.h"  // ToF
+#include "esp32-hal-ledc.h"    /// PWM
 
 #include "general.h"
 #include "IMU.h"
@@ -18,8 +19,8 @@
 #define START_Y 0
 #define START_X 0
 #define START_DIRECTION RIGHT
-#define GOAL_Y 4
-#define GOAL_X 4
+#define GOAL_Y 1
+#define GOAL_X 0
 
 void setup() {
     Serial.begin(19200);
@@ -67,6 +68,18 @@ int16_t lastSpeed;
 float target = 0;
 
 void loop() {
+    // Serial.print("Left: ");
+    // Serial.print(ToF_Left.getDistance());
+    // Serial.print(" Front: ");
+    // Serial.print(ToF_Front.getDistance());
+    // Serial.print(" Right: ");
+    // Serial.print(ToF_Right.getDistance());
+    // Serial.print(" Difference: ");
+    // Serial.print(ToF_Left.getDistance()-ToF_Right.getDistance());
+    // Serial.print("\n");
+
+    // maintainAngle(180);
+
     struct xyPair_t goalPos;
     goalPos.y = GOAL_Y;
     goalPos.x = GOAL_X;
@@ -90,4 +103,6 @@ void loop() {
     while (1) {
         delay(1);
     }
+
+    // makeMove(RIGHT, 1);
 }

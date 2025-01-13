@@ -190,8 +190,10 @@ void navigate(struct xyPair_t destination) {
     // though After the start, it will never need to measure behind it
     setColor(YELLOW);
     measure();
+    printMatrix(memory);
     turn(TURN_RIGHT);
     measure();
+    printMatrix(memory);
     uint8_t move = 0;
     // while loop continuously to calculate the best next move, makes it, and
     // then measure its surroundings
